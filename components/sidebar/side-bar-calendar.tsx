@@ -6,7 +6,7 @@ import React, { Fragment } from "react";
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 
 export default function SideBarCalendar() {
-  const { setMonth, setDate, selectedMonthIndex, twoDMonthArray } = useDateStore();
+  const { userSelectedDate,setMonth, setDate, selectedMonthIndex, twoDMonthArray } = useDateStore();
 
   const weeksOfMonth = getWeeks(selectedMonthIndex);
 
