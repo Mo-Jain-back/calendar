@@ -60,23 +60,23 @@ export default function EventPopover({
   };
 
   async function onSubmit(formData: FormData) {
-    setError(null);
-    setSuccess(null);
-    startTransition(async () => {
-      try {
-        const result = await createEvent(formData);
-        if ("error" in result) {
-          setError(result.error);
-        } else if (result.success) {
-          setSuccess(result.success);
-          setTimeout(() => {
-            onClose();
-          }, 2000);
-        }
-      } catch {
-        setError("An unexpected error occurred. Please try again.");
-      }
-    });
+    // setError(null);
+    // setSuccess(null);
+    // startTransition(async () => {
+    //   try {
+    //     const result = await createEvent(formData);
+    //     if ("error" in result) {
+    //       setError(result.error);
+    //     } else if (result.success) {
+    //       setSuccess(result.success);
+    //       setTimeout(() => {
+    //         onClose();
+    //       }, 2000);
+    //     }
+    //   } catch {
+    //     setError("An unexpected error occurred. Please try again.");
+    //   }
+    // });
   }
 
   return (

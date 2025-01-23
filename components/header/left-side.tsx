@@ -1,15 +1,18 @@
 "use client";
 
-import React from "react";
-import { Menu } from "lucide-react";
+import React, { useState } from "react";
+import {  Menu } from "lucide-react";
+import { BsCaretDownFill } from "react-icons/bs";
 import { Button } from "../ui/button";
 import Image from "next/image";
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import { useDateStore, useToggleSideBarStore, useViewStore } from "@/lib/store";
 import dayjs from "dayjs";
+import TestComponent from "./test";
 
 export default function HeaderLeft() {
   const todaysDate = dayjs();
+  const [color, setColor] = useState('#ffffff');
   const { userSelectedDate, setDate, setMonth, selectedMonthIndex } =
     useDateStore();
 
@@ -104,10 +107,12 @@ export default function HeaderLeft() {
       </div>
 
       {/* Current Month and Year Display */}
-      <h1 className="hidden text-xl lg:block">
+      <h1 className={`text-sm h-fit sm:text-xl block flex justify-around items-center`} style={{ backgroundColor: color }}>
+        <div className="sm:pb-1">
         {dayjs(new Date(dayjs().year(), selectedMonthIndex)).format(
           "MMMM YYYY",
-        )}
+        )}</div>
+        <BsCaretDownFill  className="size-3 ml-1 sm:ml-2"/>
       </h1>
     </div>
   );
