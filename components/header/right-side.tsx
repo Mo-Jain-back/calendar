@@ -11,14 +11,22 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useViewStore } from "@/lib/store";
 
-export default function HeaderRight() {
+export default function HeaderRight(
+  {setOpen}:
+  {setOpen: React.Dispatch<React.SetStateAction<boolean>>}
+) {
 
   const { setView } = useViewStore();
+
+  const handleStreamView = (v:string) => {
+    setView(v);
+    setOpen(false);
+  }
 
   return (
     <div className="flex items-center space-x-4">
     {/* <SearchComponent /> */}
-    <Select onValueChange={(v) => setView(v)}>
+    <Select onValueChange={(v) => handleStreamView(v) }>
       <SelectTrigger className="sm:w-24 w-18 p-1 sm:p-2 text-xs sm:text-sm focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ring focus-visible:ring-offset-0">
         <SelectValue placeholder="Month" />
       </SelectTrigger>
@@ -28,11 +36,6 @@ export default function HeaderRight() {
         <SelectItem value="day">Day</SelectItem>
       </SelectContent>
     </Select>
-
-    <Avatar>
-      <AvatarImage src="/img/inst2.png" />
-      <AvatarFallback>CN</AvatarFallback>
-    </Avatar>
   </div>
   )
 }

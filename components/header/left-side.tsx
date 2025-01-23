@@ -41,12 +41,18 @@ export default function HeaderLeft(
   };
 
   const handlePrevClick = () => {
+    const currentIndex = userSelectedDate.month();
     switch (selectedView) {
       case "month":
         setMonth(selectedMonthIndex - 1);
         break;
       case "week":
         setDate(userSelectedDate.subtract(1, "week"));
+        console.log("currentIndex",currentIndex);
+        console.log("selectedMonthIndex",selectedMonthIndex);
+        if(currentIndex < selectedMonthIndex){
+          setMonth(selectedMonthIndex - 1);
+        }
         break;
       case "day":
         setDate(userSelectedDate.subtract(1, "day"));
@@ -57,12 +63,18 @@ export default function HeaderLeft(
   };
 
   const handleNextClick = () => {
+    const currentIndex = userSelectedDate.month();
     switch (selectedView) {
       case "month":
         setMonth(selectedMonthIndex + 1);
         break;
       case "week":
         setDate(userSelectedDate.add(1, "week"));
+        console.log("currentIndex",currentIndex);
+        console.log("selectedMonthIndex",selectedMonthIndex);
+        if(currentIndex > selectedMonthIndex){
+          setMonth(selectedMonthIndex + 1);
+        }
         break;
       case "day":
         setDate(userSelectedDate.add(1, "day"));
@@ -98,7 +110,7 @@ export default function HeaderLeft(
       </Button>
 
       {/* Navigation Controls */}
-      <div className="hidden sm:flex flex items-center gap-3">
+      <div className="flex items-center gap-3">
         <MdKeyboardArrowLeft
           className="size-6 cursor-pointer font-bold"
           onClick={handlePrevClick}
