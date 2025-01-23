@@ -6,9 +6,13 @@ import React, { Fragment } from "react";
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 
 export default function SideBarCalendar() {
-  const { setMonth, selectedMonthIndex, twoDMonthArray } = useDateStore();
+  const { setMonth, setDate, selectedMonthIndex, twoDMonthArray } = useDateStore();
 
   const weeksOfMonth = getWeeks(selectedMonthIndex);
+
+  const handleDateClick = (day:dayjs.Dayjs) => {
+    setDate(day);
+  }
 
   return (
     <div className="my-6 p-2">
@@ -66,6 +70,7 @@ export default function SideBarCalendar() {
                     day.format("DD-MM-YY") === dayjs().format("DD-MM-YY") &&
                       "bg-blue-600 text-white",
                   )}
+                  onClick={() => handleDateClick(day)}
                 >
                   <span>{day.format("D")}</span>
                 </button>

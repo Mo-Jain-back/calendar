@@ -35,22 +35,22 @@ export default function MonthViewBox({
   return (
     <div
       className={cn(
-        "group relative flex flex-col items-center gap-y-2 border",
-        "transition-all hover:bg-violet-50",
+        "group  relative min-h-20 sm:min-h-28 flex flex-col items-center border",
+        "transition-all hover:bg-violet-50 ",
       )}
       onClick={handleClick}
     >
-      <div className="flex flex-col items-center">
+      <div className=" flex flex-col items-center">
         {rowIndex === 0 && (
-          <h4 className="text-xs text-gray-500">
+          <h4 className="text-[10px] sm:text-xs text-gray-500">
             {day.format("ddd").toUpperCase()}
           </h4>
         )}
         <h4
           className={cn(
-            "text-center text-sm",
+            "text-center text-xs sm:text-sm",
             isToday &&
-              "flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-white",
+              "flex h-120 w-6 sm:w-8 items-center justify-center rounded-full bg-blue-600 text-white",
           )}
         >
           {isFirstDayOfMonth ? day.format("MMM D") : day.format("D")}

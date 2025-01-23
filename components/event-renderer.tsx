@@ -1,4 +1,4 @@
-import { CalendarEventType, useEventStore } from "@/lib/store";
+import { CalendarEventType, useEventStore, useViewStore } from "@/lib/store";
 
 import dayjs from "dayjs";
 import React from "react";
@@ -11,7 +11,7 @@ type EventRendererProps = {
 
 export function EventRenderer({ date, view, events }: EventRendererProps) {
   const { openEventSummary } = useEventStore();
-
+  const { selectedView } = useViewStore();
   const filteredEvents = events.filter((event: CalendarEventType) => {
     if (view === "month") {
       return event.date.format("DD-MM-YY") === date.format("DD-MM-YY");
@@ -29,7 +29,7 @@ export function EventRenderer({ date, view, events }: EventRendererProps) {
             e.stopPropagation();
             openEventSummary(event);
           }}
-          className="line-clamp-1 w-[90%] cursor-pointer rounded-sm bg-green-700 p-1 text-sm text-white"
+          className="line-clamp-1 w-full m-0 h-[10px] sm:h-6 flex justify-start items-center cursor-pointer rounded-sm bg-green-700 px-[1px] pb-[1px] text-[8px] sm:text-sm text-white"
         >
           {event.title}
         </div>

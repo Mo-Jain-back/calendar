@@ -10,7 +10,10 @@ import { useDateStore, useToggleSideBarStore, useViewStore } from "@/lib/store";
 import dayjs from "dayjs";
 import TestComponent from "./test";
 
-export default function HeaderLeft() {
+export default function HeaderLeft(
+  {setOpen}:
+  {setOpen: React.Dispatch<React.SetStateAction<boolean>>}
+) {
   const todaysDate = dayjs();
   const [color, setColor] = useState('#ffffff');
   const { userSelectedDate, setDate, setMonth, selectedMonthIndex } =
@@ -70,7 +73,7 @@ export default function HeaderLeft() {
   };
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center sm:gap-3">
       {/* Sidebar Toggle and Calendar Icon */}
       <div className="hidden items-center lg:flex">
         <Button
@@ -90,12 +93,12 @@ export default function HeaderLeft() {
       </div>
 
       {/* Today Button */}
-      <Button variant="outline" onClick={handleTodayClick}>
+      <Button variant="outline" className="text-xs sm:text-sm px-2 py-1" onClick={handleTodayClick}>
         Today
       </Button>
 
       {/* Navigation Controls */}
-      <div className="flex items-center gap-3">
+      <div className="hidden sm:flex flex items-center gap-3">
         <MdKeyboardArrowLeft
           className="size-6 cursor-pointer font-bold"
           onClick={handlePrevClick}
@@ -107,13 +110,15 @@ export default function HeaderLeft() {
       </div>
 
       {/* Current Month and Year Display */}
-      <h1 className={`text-sm h-fit sm:text-xl block flex justify-around items-center`} style={{ backgroundColor: color }}>
+      <h1 className={`text-sm ml-2 sm:ml-0 h-fit w-fit sm:text-xl block flex justify-around items-center`} style={{ backgroundColor: color }}>
         <div className="sm:pb-1">
         {dayjs(new Date(dayjs().year(), selectedMonthIndex)).format(
           "MMMM YYYY",
         )}</div>
-        <BsCaretDownFill  className="size-3 ml-1 sm:ml-2"/>
       </h1>
+        <BsCaretDownFill  className="text-xl sm:hidden min-size-3 ml-1 border border-gray-200 rounded-md p-1 h-fit" 
+        onClick={() => setOpen((open)=> !open)}
+        />
     </div>
   );
 }

@@ -22,7 +22,7 @@ export default function WeekView() {
 
   return (
     <>
-      <div className="grid grid-cols-[auto_1fr_1fr_1fr_1fr_1fr_1fr_1fr] place-items-center px-4 py-2">
+      <div className="grid grid-cols-[auto_1fr_1fr_1fr_1fr_1fr_1fr_1fr] bg-gray-300 place-items-center px-4 py-2">
         <div className="w-16 border-r border-gray-300">
           <div className="relative h-16">
             <div className="absolute top-2 text-xs text-gray-600">GMT +2</div>
@@ -38,7 +38,7 @@ export default function WeekView() {
             </div>
             <div
               className={cn(
-                "h-12 w-12 rounded-full p-2 text-2xl",
+                "h-8 w-8 sm:h-10 sm:w-10 text-center flex items-center rounded-full p-2 text-sm sm:text-lg",
                 today && "bg-blue-600 text-white",
               )}
             >
