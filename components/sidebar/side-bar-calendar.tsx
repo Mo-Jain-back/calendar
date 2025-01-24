@@ -1,5 +1,5 @@
 import { getWeeks } from "@/lib/getTime";
-import { useDateStore } from "@/lib/store";
+import { useDateStore, useViewStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
 import React, { Fragment } from "react";
@@ -10,9 +10,21 @@ export default function SideBarCalendar() {
 
   const weeksOfMonth = getWeeks(selectedMonthIndex);
 
+  const { selectedView } = useViewStore();
   const handleDateClick = (day:dayjs.Dayjs) => {
     setDate(day);
   }
+
+  const handlePrevClick = () => {
+    setMonth(selectedMonthIndex - 1);
+    setDate(userSelectedDate.subtract(1, "month"));
+  };
+
+  const handleNextClick = () => {
+    setMonth(selectedMonthIndex + 1);
+    setDate(userSelectedDate.add(1, "month"));
+    
+  };
 
   return (
     <div className="my-6 p-2">
@@ -22,14 +34,15 @@ export default function SideBarCalendar() {
             "MMMM YYYY",
           )}
         </h4>
+       
         <div className="flex items-center gap-3">
           <MdKeyboardArrowLeft
             className="size-5 cursor-pointer font-bold"
-            onClick={() => setMonth(selectedMonthIndex - 1)}
+            onClick={handlePrevClick}
           />
           <MdKeyboardArrowRight
             className="size-5 cursor-pointer font-bold"
-            onClick={() => setMonth(selectedMonthIndex + 1)}
+            onClick={handleNextClick}
           />
         </div>
       </div>

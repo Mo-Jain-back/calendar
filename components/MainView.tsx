@@ -38,6 +38,9 @@ export default function MainView({
       date: dayjs(event.date),
       title: event.title,
       description: event.description,
+      startTime: event.startTime,
+      endTime: event.endTime,
+      allDay: event.allDay,
     }));
 
     setEvents(mappedEvents);

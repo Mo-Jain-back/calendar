@@ -1,4 +1,4 @@
-import { CalendarEventType, useEventStore, useViewStore } from "@/lib/store";
+import { CalendarEventType, useEventStore } from "@/lib/store";
 
 import dayjs from "dayjs";
 import React from "react";
@@ -11,7 +11,6 @@ type EventRendererProps = {
 
 export function EventRenderer({ date, view, events }: EventRendererProps) {
   const { openEventSummary } = useEventStore();
-  const { selectedView } = useViewStore();
   const filteredEvents = events.filter((event: CalendarEventType) => {
     if (view === "month") {
       return event.date.format("DD-MM-YY") === date.format("DD-MM-YY");
@@ -22,18 +21,33 @@ export function EventRenderer({ date, view, events }: EventRendererProps) {
 
   return (
     <>
-      {filteredEvents.map((event) => (
-        <div
-          key={event.id}
-          onClick={(e) => {
-            e.stopPropagation();
-            openEventSummary(event);
-          }}
-          className="line-clamp-1 w-full m-0 h-[10px] sm:h-6 flex justify-start items-center cursor-pointer rounded-sm bg-green-700 px-[1px] pb-[1px] text-[8px] sm:text-sm text-white"
-        >
-          {event.title}
-        </div>
-      ))}
+      {filteredEvents.map((event) => {
+        // Calculate the height dynamically based on the time difference
+        const start = dayjs(`${dayjs(event.date).format('YYYY-MM-DD')} ${event.startTime}`, 'YYYY-MM-DD HH:mm');
+        const end = dayjs(`${dayjs(event.date).format('YYYY-MM-DD')} ${event.endTime}`, 'YYYY-MM-DD HH:mm');
+        const Zero = dayjs(`${dayjs(event.date).format('YYYY-MM-DD')} 00:00`, 'YYYY-MM-DD HH:mm');
+
+        const durationInMinutes = end.diff(start, 'minute'); // Get the difference in minutes
+        const heightFactor = 16 / 60; // Assuming `h-16` corresponds to 1 hour (60 minutes)
+        const dynamicHeight = durationInMinutes * heightFactor*4.25;
+        const durationFromZero = start.diff(Zero, 'minute'); // Get the difference in minutes
+        const dynamicTop = durationFromZero * heightFactor*4.25;
+        return (
+          <div
+            key={event.id}
+            onClick={(e) => {
+              e.stopPropagation();
+              openEventSummary(event);
+            }}
+            style={{ height: `${(view !== "month") && dynamicHeight}px`, top: `${(view !== "month") && dynamicTop}px` }} // Set the height dynamically
+            className={`absolute z-10 line-clamp-1 max-sm:h-[12px]  w-full m-0 flex justify-start 
+              items-center cursor-pointer rounded-sm bg-green-700 p-[2px] text-[7px] 
+              sm:text-sm text-white`}
+          >
+            {event.title}
+          </div>
+        );
+      })}
     </>
   );
 }

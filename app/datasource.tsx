@@ -42,8 +42,8 @@ export const eventsData = [
         title: "event5",
         date: new Date("1/16/2025"),
         description: "fifth event" ,
-        startTime: "01:00",
-        endTime:"10:00",
+        startTime: "04:00",
+        endTime:"10:30",
         allDay:false
     }
 ]

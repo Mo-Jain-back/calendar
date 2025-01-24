@@ -1,7 +1,7 @@
 "use client";
 import { useDateStore, useToggleSideBarStore, useViewStore } from "@/lib/store";
 import dayjs from "dayjs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SideBarCalendar from "../sidebar/side-bar-calendar";
 
 const DateButtons = ({open}:{open:boolean}) => {
@@ -9,31 +9,22 @@ const DateButtons = ({open}:{open:boolean}) => {
     const todaysDate = dayjs();
     const { userSelectedDate, setDate, setMonth, selectedMonthIndex } =
         useDateStore();
-
     const [selectedMonth,setSelectedMonth] = useState(todaysDate.format("MMM"));
     const { selectedView } = useViewStore();
+
+    useEffect(() => {
+        setSelectedMonth(months[selectedMonthIndex]);
+    }, [selectedMonthIndex]);
+    
     const handleClick = (month:string,index:number) => {
         setSelectedMonth(month);
         const difference = index-selectedMonthIndex;
-        switch (selectedView) {
-            case "month":
-              setMonth(index);
-              break;
-            case "week":
-              if(difference>0){
-                setDate(userSelectedDate.add(4*difference, "week"));
-              }else if(difference<0){
-                setDate(userSelectedDate.subtract(4.34*difference*(-1), "week"));
-              } 
-              setMonth(index);
-              break;
-            case "day":
-              setDate(userSelectedDate.add(30, "day"));
-              setMonth(index);
-              break;
-            default:
-              break;
-          }
+        setMonth(index);
+        if(difference>0){
+          setDate(userSelectedDate.add(difference, "month"));
+        }else if(difference<0){
+          setDate(userSelectedDate.subtract(difference*(-1), "month"));
+        }
     }
     return (
         <>

@@ -76,6 +76,7 @@ export default function WeekView() {
                   {getHours.map((hour, i) => (
                     <div
                       key={i}
+                      style={{ overflow: 'visible' }} // Add this style
                       className="relative flex h-16 cursor-pointer flex-col items-center gap-y-2 border-b border-gray-300 hover:bg-gray-100"
                       onClick={() => {
                         setDate(dayDate.hour(hour.hour()));

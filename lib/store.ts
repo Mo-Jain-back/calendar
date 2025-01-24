@@ -21,6 +21,9 @@ export type CalendarEventType = {
   title: string;
   date: dayjs.Dayjs;
   description: string;
+  startTime: string;
+  endTime: string;
+  allDay: boolean;
 };
 
 type EventStore = {

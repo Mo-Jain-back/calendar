@@ -41,21 +41,25 @@ export default function HeaderLeft(
   };
 
   const handlePrevClick = () => {
-    const currentIndex = userSelectedDate.month();
+    let currentMonthIndex;
+    const endOfWeek = userSelectedDate.endOf("week");
     switch (selectedView) {
       case "month":
         setMonth(selectedMonthIndex - 1);
         break;
       case "week":
-        setDate(userSelectedDate.subtract(1, "week"));
-        console.log("currentIndex",currentIndex);
-        console.log("selectedMonthIndex",selectedMonthIndex);
-        if(currentIndex < selectedMonthIndex){
+        currentMonthIndex = endOfWeek.subtract(1, "week").month();
+        setDate(endOfWeek.subtract(1, "week"));
+        if(currentMonthIndex < selectedMonthIndex){
           setMonth(selectedMonthIndex - 1);
         }
         break;
       case "day":
+        currentMonthIndex = userSelectedDate.subtract(1, "day").month();
         setDate(userSelectedDate.subtract(1, "day"));
+        if(currentMonthIndex < selectedMonthIndex){
+          setMonth(selectedMonthIndex - 1);
+        }
         break;
       default:
         break;
@@ -63,21 +67,25 @@ export default function HeaderLeft(
   };
 
   const handleNextClick = () => {
-    const currentIndex = userSelectedDate.month();
+    let currentMonthIndex = userSelectedDate.month();
+    const startOfWeek = userSelectedDate.startOf("week");
     switch (selectedView) {
       case "month":
         setMonth(selectedMonthIndex + 1);
         break;
       case "week":
-        setDate(userSelectedDate.add(1, "week"));
-        console.log("currentIndex",currentIndex);
-        console.log("selectedMonthIndex",selectedMonthIndex);
-        if(currentIndex > selectedMonthIndex){
+        currentMonthIndex = startOfWeek.add(1, "week").month();
+        setDate(startOfWeek.add(1, "week"));
+        if(currentMonthIndex > selectedMonthIndex){
           setMonth(selectedMonthIndex + 1);
         }
         break;
       case "day":
+        currentMonthIndex = userSelectedDate.add(1, "day").month();
         setDate(userSelectedDate.add(1, "day"));
+        if(currentMonthIndex > selectedMonthIndex){
+          setMonth(selectedMonthIndex + 1);
+        }
         break;
       default:
         break;
