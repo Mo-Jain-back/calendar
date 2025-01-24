@@ -1,11 +1,11 @@
 import { getHours, getWeekDays } from "@/lib/getTime";
 import { useDateStore, useEventStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import React, { useEffect, useState } from "react";
 import { ScrollArea } from "./ui/scroll-area";
 import { EventRenderer } from "./event-renderer";
-
+import {CalendarEventType} from "@/lib/store";
 
 export default function WeekView() {
   const [currentTime, setCurrentTime] = useState(dayjs());
@@ -20,11 +20,19 @@ export default function WeekView() {
     return () => clearInterval(interval);
   }, []);
 
+  const getFormatedEvents = (events:CalendarEventType[], date:Dayjs) => {
+    const filteredEvents = events.filter((event: CalendarEventType) => {
+        return event.date.format("DD-MM-YY HH") === date.format("DD-MM-YY HH");
+      });
+
+    return filteredEvents;
+  }
+
   return (
     <>
       <div className="grid grid-cols-[auto_1fr_1fr_1fr_1fr_1fr_1fr_1fr] bg-gray-300 place-items-center px-4 py-2">
         <div className="w-16 border-r border-gray-300">
-          <div className="relative h-16">
+          <div className="relative h-[64px]">
             <div className="absolute top-2 text-xs text-gray-600">GMT +2</div>
           </div>
         </div>
@@ -72,20 +80,21 @@ export default function WeekView() {
                 .add(index, "day");
 
               return (
-                <div key={index} className="relative border-r border-gray-300">
+                <div key={index} className="relative border-1 border-black border-r border-gray-300">
                   {getHours.map((hour, i) => (
                     <div
                       key={i}
                       style={{ overflow: 'visible' }} // Add this style
-                      className="relative flex h-16 cursor-pointer flex-col items-center gap-y-2 border-b border-gray-300 hover:bg-gray-100"
+                      className="relative flex h-[64px]  cursor-pointer flex-col items-center gap-y-2 border-b border-gray-300 hover:bg-gray-100"
                       onClick={() => {
                         setDate(dayDate.hour(hour.hour()));
                         openPopover();
                       }}
                     >
                       <EventRenderer
-                        events={events}
+                        events={getFormatedEvents(events,dayDate.hour(hour.hour()))}
                         date={dayDate.hour(hour.hour())}
+                        hour={hour.hour()}
                         view="week"
                       />
                     </div>

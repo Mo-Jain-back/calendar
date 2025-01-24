@@ -39,11 +39,29 @@ export const eventsData = [
     },
     { 
         id: "5",
+        title: "event6",
+        date: new Date("1/12/2025"),
+        description: "forth event" ,
+        startTime: "02:00",
+        endTime:"20:00",
+        allDay:false
+    },
+    { 
+        id: "6",
         title: "event5",
         date: new Date("1/16/2025"),
         description: "fifth event" ,
         startTime: "04:00",
         endTime:"10:30",
+        allDay:false
+    },
+    { 
+        id: "7",
+        title: "event7",
+        date: new Date("1/12/2025"),
+        description: "fifth event" ,
+        startTime: "03:00",
+        endTime:"12:00",
         allDay:false
     }
 ]
