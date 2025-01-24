@@ -10,7 +10,7 @@ import {CalendarEventType} from "@/lib/store";
 export default function WeekView() {
   const [currentTime, setCurrentTime] = useState(dayjs());
   const { openPopover, events } = useEventStore();
-
+  const { openEventSummary } = useEventStore();
   const { userSelectedDate, setDate } = useDateStore();
 
   useEffect(() => {
@@ -31,7 +31,7 @@ export default function WeekView() {
   return (
     <>
       <div className="grid grid-cols-[auto_1fr_1fr_1fr_1fr_1fr_1fr_1fr] bg-gray-300 place-items-center px-4 py-2">
-        <div className="w-16 border-r border-gray-300">
+        <div className="w-16 border-r border-gray-400">
           <div className="relative h-[64px]">
             <div className="absolute top-2 text-xs text-gray-600">GMT +2</div>
           </div>
@@ -39,8 +39,10 @@ export default function WeekView() {
 
         {/* Week View Header */}
 
-        {getWeekDays(userSelectedDate).map(({ currentDate, today }, index) => (
-          <div key={index} className="flex flex-col items-center">
+        {getWeekDays(userSelectedDate).map(({ currentDate, today }, index) =>{
+          const filteredEvents = getFormatedEvents(events,currentDate);
+          return(
+          <div key={index} className="flex flex-col items-center w-full">
             <div className={cn("text-xs", today && "text-blue-600")}>
               {currentDate.format("ddd")}
             </div>
@@ -52,8 +54,26 @@ export default function WeekView() {
             >
               {currentDate.format("DD")}{" "}
             </div>
+            <div className="flex flex-col w-full">
+              {
+                filteredEvents.length > 0 && filteredEvents.map((event, index) => (
+                  <div
+                    key={event.id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openEventSummary(event);
+                    }}
+                    className={` my-[1px] max-sm:h-[12px] w-full flex justify-center items-center cursor-pointer rounded-sm bg-blue-700 text-[7px] 
+                        sm:text-xs text-white`}
+                        >
+                    {event.title}
+                  </div>
+                ))
+              }
+            </div>
           </div>
-        ))}
+        )})}
+        
       </div>
 
       {/* Time Column & Corresponding Boxes of time per each date  */}

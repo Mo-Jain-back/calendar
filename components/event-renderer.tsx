@@ -39,7 +39,7 @@ export function EventRenderer({ date, view, events, hour }: EventRendererProps) 
               openEventSummary(event);
             }}
             className={`z-10 my-[1px] line-clamp-1 max-sm:h-[12px] w-full m-0 flex justify-start 
-              items-center cursor-pointer rounded-sm bg-green-700 p-[1px] text-[7px] 
+              items-center cursor-pointer rounded-sm bg-blue-700 p-[1px] text-[7px] 
               sm:text-xs text-white`}
           >
             {event.title}
@@ -47,7 +47,7 @@ export function EventRenderer({ date, view, events, hour }: EventRendererProps) 
         ))}
       {view === "month" && noOfEvents > 4 && (
         <div
-          className="z-10 line-clamp-1 max-sm:h-[8px] p-[1px] w-full m-0 flex justify-start 
+          className="z-10 line-clamp-1 max-sm:h-[8px] w-full m-0 flex justify-start 
             items-center cursor-pointer rounded-sm bg-gray-300 text-[7px] 
              text-gray-700"
           onClick={(e) => {
@@ -97,10 +97,10 @@ export function EventRenderer({ date, view, events, hour }: EventRendererProps) 
                 top: `${topOffset}px`,
               }}
               className={`absolute z-10 mx-[1px] line-clamp-1 max-sm:h-[12px] m-0 flex justify-start 
-                items-center cursor-pointer rounded-sm bg-green-700 p-[2px] text-[7px] 
+                items-center cursor-pointer rounded-sm bg-blue-700 p-[2px] text-[7px] 
                 sm:text-sm text-white`}
             >
-              {noOfEvents < 3 ? event.title : ""}
+              {noOfEvents < 3 || view === "day" ? event.title : ""}
             </div>
           );
         })}
