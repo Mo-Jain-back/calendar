@@ -17,3 +17,4 @@ Google Calendar clone using Next.js, React, Day.js, Neon Postgres, and Drizzle O
 - Tailwindcss
 - Neon/Postgresql DB
 - Drizzle ORM
+
