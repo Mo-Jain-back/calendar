@@ -22,7 +22,7 @@ export default function WeekView() {
 
   const getFormatedEvents = (events:CalendarEventType[], date:Dayjs) => {
     const filteredEvents = events.filter((event: CalendarEventType) => {
-        return event.date.format("DD-MM-YY HH") === date.format("DD-MM-YY HH");
+        return event.startDate.format("DD-MM-YY HH") === date.format("DD-MM-YY HH");
       });
 
     return filteredEvents;
@@ -30,7 +30,7 @@ export default function WeekView() {
 
   return (
     <>
-      <div className="grid grid-cols-[auto_1fr_1fr_1fr_1fr_1fr_1fr_1fr] bg-gray-300 place-items-center px-4 py-2">
+      <div className="grid grid-cols-[auto_1fr_1fr_1fr_1fr_1fr_1fr_1fr] bg-gray-300 px-4 py-2">
         <div className="w-16 border-r border-gray-400">
           <div className="relative h-[64px]">
             <div className="absolute top-2 text-xs text-gray-600">GMT +2</div>
@@ -42,8 +42,8 @@ export default function WeekView() {
         {getWeekDays(userSelectedDate).map(({ currentDate, today }, index) =>{
           const filteredEvents = getFormatedEvents(events,currentDate);
           return(
-          <div key={index} className="flex flex-col items-center w-full">
-            <div className={cn("text-xs", today && "text-blue-600")}>
+          <div key={index} className="flex flex-col items-center justify-start w-full">
+            <div className={cn("text-xs mt-6 sm:mt-8", today && "text-blue-600")}>
               {currentDate.format("ddd")}
             </div>
             <div
@@ -98,10 +98,11 @@ export default function WeekView() {
               const dayDate = userSelectedDate
                 .startOf("week")
                 .add(index, "day");
-
-              return (
-                <div key={index} className="relative border-1 border-black border-r border-gray-300">
-                  {getHours.map((hour, i) => (
+                return (
+                  <div key={index} className="relative border-1 border-black border-r border-gray-300">
+                  {getHours.map((hour, i) => {
+                    const filteredEvents = getFormatedEvents(events,dayDate.hour(hour.hour()));
+                    return(
                     <div
                       key={i}
                       style={{ overflow: 'visible' }} // Add this style
@@ -110,15 +111,15 @@ export default function WeekView() {
                         setDate(dayDate.hour(hour.hour()));
                         openPopover();
                       }}
-                    >
+                    > 
                       <EventRenderer
-                        events={getFormatedEvents(events,dayDate.hour(hour.hour()))}
-                        date={dayDate.hour(hour.hour())}
+                        events={filteredEvents}
+                        date={dayDate}
                         hour={hour.hour()}
                         view="week"
                       />
                     </div>
-                  ))}
+                  )})}
                   {/* Current time indicator */}
 
                   {isCurrentDay(dayDate) && today && (

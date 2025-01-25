@@ -19,9 +19,10 @@ export default function DayView() {
     return () => clearInterval(interval);
   }, []);
 
+
   const getFormatedEvents = (events:CalendarEventType[], date:Dayjs) => {
     const filteredEvents = events.filter((event: CalendarEventType) => {
-        return event.date.format("DD-MM-YY HH") === date.format("DD-MM-YY HH");
+        return event.startDate.format("DD-MM-YY") === date.format("DD-MM-YY");
       });
 
     return filteredEvents;
@@ -65,7 +66,6 @@ export default function DayView() {
                 ))
               }
             </div>
-        <div></div>
       </div>
 
       <ScrollArea className="h-[70vh]">
@@ -93,7 +93,7 @@ export default function DayView() {
                 }}
               >
                 <EventRenderer
-                  events={getFormatedEvents(events,userSelectedDate.hour(hour.hour()))}
+                  events={getFormatedEvents(events,userSelectedDate)}
                   date={userSelectedDate.hour(hour.hour())}
                   view="day"
                   hour={hour.hour()}

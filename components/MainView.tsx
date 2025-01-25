@@ -35,10 +35,11 @@ export default function MainView({
   useEffect(() => {
     const mappedEvents: CalendarEventType[] = eventsData.map((event) => ({
       id: event.id,
-      date: dayjs(event.date),
+      startDate: dayjs(event.startDate),
       title: event.title,
       description: event.description,
       startTime: event.startTime,
+      endDate: dayjs(event.endDate),
       endTime: event.endTime,
       allDay: event.allDay,
     }));

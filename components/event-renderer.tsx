@@ -6,7 +6,7 @@ type EventRendererProps = {
   date: dayjs.Dayjs;
   view: "month" | "week" | "day";
   events: CalendarEventType[];
-  hour: number;
+  hour?: number;
 };
 
 export function EventRenderer({ date, view, events, hour }: EventRendererProps) {
@@ -14,19 +14,30 @@ export function EventRenderer({ date, view, events, hour }: EventRendererProps) 
 
   // Filter events based on the current view and hour
   const filteredEvents = events.filter((event: CalendarEventType) => {
+    const eventHour = parseInt(event.startTime.split(":")[0]);
     if (view === "month") {
-      return event.date.format("DD-MM-YY") === date.format("DD-MM-YY");
+      return event.startDate.format("DD-MM-YY") === date.format("DD-MM-YY");
     } else if (view === "week" || view === "day") {
-      return event.date.hour() === hour;
+      return event.startDate.hour() === hour;
     }
     return false;
   });
+
+  // const filteredEvents = events.filter((event: CalendarEventType) => {
+  //   const eventHour = parseInt(event.startTime.split(":")[0]);
+  //   if (view === "month") {
+  //     return event.startDate.format("DD-MM-YY") === date.format("DD-MM-YY");
+  //   } else if (view === "week" || view === "day") {
+  //     return event.startDate.format("DD-MM-YY") === date.format("DD-MM-YY") && eventHour === hour;
+  //   }
+  //   return false;
+  // });
 
   const noOfEvents = filteredEvents.length;
 
   return (
     <div
-      className={`relative w-full ${
+      className={` w-full ${
         view === "month" ? "flex flex-col" : "flex"
       }`}
     >
@@ -62,11 +73,11 @@ export function EventRenderer({ date, view, events, hour }: EventRendererProps) 
         filteredEvents.map((event, index) => {
           // For week and day views, calculate height, width, and positioning
           const start = dayjs(
-            `${dayjs(event.date).format("YYYY-MM-DD")} ${event.startTime}`,
+            `${dayjs(event.startDate).format("YYYY-MM-DD")} ${event.startTime}`,
             "YYYY-MM-DD HH:mm"
           );
           const end = dayjs(
-            `${dayjs(event.date).format("YYYY-MM-DD")} ${event.endTime}`,
+            `${dayjs(event.startDate).format("YYYY-MM-DD")} ${event.endTime}`,
             "YYYY-MM-DD HH:mm"
           );
 
