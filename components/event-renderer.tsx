@@ -48,7 +48,7 @@ export function EventRenderer({ date, view, events, hour }: EventRendererProps) 
       {view === "month" && noOfEvents > 4 && (
         <div
           className="z-10 line-clamp-1 max-sm:h-[8px] w-full m-0 flex justify-start 
-            items-center cursor-pointer rounded-sm bg-gray-300 text-[7px] 
+            items-center cursor-pointer rounded-sm bg-gray-300 text-[7px] lg:text-xs lg:p-[2px]
              text-gray-700"
           onClick={(e) => {
             e.stopPropagation();

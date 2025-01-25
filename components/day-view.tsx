@@ -33,8 +33,7 @@ export default function DayView() {
 
   return (
     <>
-      <div className="grid grid-cols-[auto_auto_1fr] px-4">
-        <div className="w-16 border-r border-gray-300 text-xs">GMT +2</div>
+      <div className="flex px-4">
         <div className="flex w-16 flex-col items-center">
           <div className={cn("text-xs", isToday && "text-blue-600")}>
             {userSelectedDate.format("ddd")}{" "}
@@ -47,9 +46,11 @@ export default function DayView() {
           >
             {userSelectedDate.format("DD")}{" "}
           </div>
-          <div className="flex flex-col w-full">
+          
+        </div>
+        <div className="flex flex-col w-full">
               {
-                getFormatedEvents(events,userSelectedDate).length > 0 && getFormatedEvents(events,userSelectedDate).map((event, index) => (
+                getFormatedEvents(events,userSelectedDate).length > 0 && getFormatedEvents(events,userSelectedDate).map((event) => (
                   <div
                     key={event.id}
                     onClick={(e) => {
@@ -64,7 +65,6 @@ export default function DayView() {
                 ))
               }
             </div>
-        </div>
         <div></div>
       </div>
 
