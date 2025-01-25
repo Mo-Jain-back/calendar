@@ -49,7 +49,7 @@ export const eventsData = [
         description: "forth event" ,
         startTime: "02:00",
         endTime:"20:00",
-        allDay:false
+        allDay:true
     },
     { 
         id: "6",
@@ -69,7 +69,7 @@ export const eventsData = [
         description: "fifth event" ,
         startTime: "03:00",
         endTime:"12:00",
-        allDay:false
+        allDay:true
     },
     { 
         id: "8",
@@ -79,7 +79,7 @@ export const eventsData = [
         description: "eighth event" ,
         startTime: "03:30",
         endTime:"16:00",
-        allDay:false
+        allDay:true
     },
     { 
         id: "9",

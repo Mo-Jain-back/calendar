@@ -18,7 +18,7 @@ export function EventRenderer({ date, view, events, hour }: EventRendererProps) 
     if (view === "month") {
       return event.startDate.format("DD-MM-YY") === date.format("DD-MM-YY");
     } else if (view === "week" || view === "day") {
-      return event.startDate.hour() === hour;
+      return event.startDate.hour() === hour && !event.allDay;
     }
     return false;
   });

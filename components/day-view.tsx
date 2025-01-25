@@ -5,12 +5,17 @@ import React, { useEffect, useState } from "react";
 import { ScrollArea } from "./ui/scroll-area";
 import { getHours, isCurrentDay } from "@/lib/getTime";
 import { EventRenderer } from "./event-renderer";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 
 export default function DayView() {
   const [currentTime, setCurrentTime] = useState(dayjs());
   const { openPopover, events } = useEventStore();
   const { userSelectedDate, setDate } = useDateStore();
+  const { openEventSummary } = useEventStore();
+  const [filteredEvents,setFilteredEvents] = useState<CalendarEventType[]>([]);
+  const [noOfEvents, setNoOfEvents] = useState<number>(0);
+  const [isEventHidden, setIsEventHidden] = useState(true);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -18,6 +23,10 @@ export default function DayView() {
     }, 60000); // Update every minute
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    getAllDayEvents(events,userSelectedDate);
+  }, [userSelectedDate]);
 
 
   const getFormatedEvents = (events:CalendarEventType[], date:Dayjs) => {
@@ -27,7 +36,15 @@ export default function DayView() {
 
     return filteredEvents;
   }
-  const { openEventSummary } = useEventStore();
+
+  const getAllDayEvents = (events:CalendarEventType[], date:Dayjs) => {
+      const tempEvents = events.filter((event: CalendarEventType) => {
+          return event.startDate.format("DD-MM-YY") === date.format("DD-MM-YY") && event.allDay;
+        });
+      setNoOfEvents(tempEvents.length);
+      setFilteredEvents(tempEvents);
+    }
+  
 
   const isToday =
     userSelectedDate.format("DD-MM-YY") === dayjs().format("DD-MM-YY");
@@ -47,11 +64,18 @@ export default function DayView() {
           >
             {userSelectedDate.format("DD")}{" "}
           </div>
+          {isEventHidden ?
+          <ChevronDown className="size-4 cursor-pointer" onClick={()=> setIsEventHidden(false)}/>
+          :
+          <ChevronUp className="size-4 cursor-pointer" onClick={()=> setIsEventHidden(true)}/>
+          }
           
         </div>
         <div className="flex flex-col w-full">
+            {noOfEvents < 5 || !isEventHidden ? 
+              <>
               {
-                getFormatedEvents(events,userSelectedDate).length > 0 && getFormatedEvents(events,userSelectedDate).map((event) => (
+                filteredEvents.length > 0 && filteredEvents.map((event) => (
                   <div
                     key={event.id}
                     onClick={(e) => {
@@ -65,6 +89,27 @@ export default function DayView() {
                   </div>
                 ))
               }
+              </>
+              :
+              <>
+                {
+                  filteredEvents.slice(0, 3).map((event, index) => (
+                    <div
+                      key={event.id}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openEventSummary(event);
+                      }}
+                      className={` my-[1px] max-sm:h-[12px] w-full flex justify-center items-center cursor-pointer rounded-sm bg-blue-700 text-[7px] 
+                          sm:text-xs text-white`}
+                          >
+                      {event.title}
+                    </div>
+                  ))
+                }
+                <div className="text-xs sm:text-sm px-2">+{noOfEvents-3}</div>
+              </>
+            }
             </div>
       </div>
 
