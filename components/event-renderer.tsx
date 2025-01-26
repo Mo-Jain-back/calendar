@@ -1,18 +1,65 @@
+"use client";
 import { CalendarEventType, useEventStore } from "@/lib/store";
 import dayjs, { Dayjs } from "dayjs";
-import React from "react";
+import React, { use, useEffect, useState } from "react";
 
 type EventRendererProps = {
   date: dayjs.Dayjs;
   view: "month" | "week" | "day";
   events: CalendarEventType[];
   hour?: number;
+  eventsRow?: { id: string; rowIndex: number }[];
 };
 
-export function EventRenderer({ date, view, events, hour }: EventRendererProps) {
+export function EventRenderer({ date, view, events, hour,eventsRow }: EventRendererProps) {
   const { openEventSummary } = useEventStore();
+  const [startRow, setStartRow] = useState<number>(0);
 
-  // Filter events based on the current view and hour
+  useEffect(() => {
+    console.log("date", date.date());
+    console.log("events", events);
+    console.log("startRow", startRow);
+    findStartRow();
+    addMultiDayEvents();
+    console.log("eventsRow", eventsRow);
+  }, [events,setStartRow]);
+
+  const findStartRow = () => {
+    let maxRowIndex = 0;
+    events.forEach((event) => {
+      if (eventsRow) {
+        if (
+          (event.startDate.isBefore(date, "day") && event.endDate.isAfter(date, "day")) ||
+          (event.startDate.isBefore(date, "day") && event.endDate.isSame(date, "day"))
+        ) {
+          console.log(".................................................");
+          const eventRow = eventsRow.find((e) => e.id === event.id);
+          console.log("eventRow", eventRow);
+          const rowIndex = eventRow ? eventRow.rowIndex : 0;
+          maxRowIndex = Math.max(maxRowIndex, rowIndex);
+        }
+      }
+    });
+    console.log("rowIndex", maxRowIndex);
+    setStartRow(maxRowIndex);
+  };
+
+  const addMultiDayEvents = () => {
+    events.forEach((event) => {
+      if (event.startDate.isSame(date, "day") && event.endDate.isAfter(date, "day")) {
+        setStartRow((prevStartRow) => {
+          const newStartRow = prevStartRow + 1;
+          if (eventsRow) {
+            eventsRow.push({ id: event.id, rowIndex: newStartRow });
+            console.log("startRow", newStartRow);
+          }
+          return newStartRow;
+        });
+      }
+    });
+  };
+
+
   const filteredEvents = events.filter((event: CalendarEventType) => {
     const eventHour = parseInt(event.startTime.split(":")[0]);
     if (view === "month") {
@@ -33,7 +80,6 @@ export function EventRenderer({ date, view, events, hour }: EventRendererProps) 
     const temp = events.filter((e: CalendarEventType) => {
       return e.startDate.isBefore(date, "day") && e.endDate.isAfter(date, "day")
       || e.startDate.isBefore(date, "day") && e.endDate.isSame(date, "day")
-      
     });
     return temp.length;
   }
@@ -51,7 +97,7 @@ export function EventRenderer({ date, view, events, hour }: EventRendererProps) 
   
 
   const occupiedRows: Record<string, number[]> = {};
-  
+   
   const noOfEvents = sortedEvents.length;
 
   return (
