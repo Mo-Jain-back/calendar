@@ -1,3 +1,4 @@
+import dayjs from "dayjs"
 
 
 export const eventsData = [
@@ -43,9 +44,9 @@ export const eventsData = [
     },
     { 
         id: "5",
-        title: "event6",
+        title: "event5",
         startDate: new Date("1/12/2025"),
-        endDate: new Date("01/12/2025"),
+        endDate: new Date("01/15/2025"),
         description: "forth event" ,
         startTime: "02:00",
         endTime:"20:00",
@@ -53,7 +54,7 @@ export const eventsData = [
     },
     { 
         id: "6",
-        title: "event5",
+        title: "event6",
         startDate: new Date("1/16/2025"),
         endDate: new Date("01/16/2025"),
         description: "fifth event" ,
@@ -65,7 +66,7 @@ export const eventsData = [
         id: "7",
         title: "event7",
         startDate: new Date("1/12/2025"),
-        endDate: new Date("01/12/2025"),
+        endDate: new Date("01/16/2025"),
         description: "fifth event" ,
         startTime: "03:00",
         endTime:"12:00",
@@ -90,5 +91,43 @@ export const eventsData = [
         startTime: "6:30",
         endTime:"13:00",
         allDay:false
+    },
+    { 
+        id: "10",
+        title: "event10",
+        startDate: new Date("1/16/2025"),
+        endDate: new Date("01/16/2025"),
+        description: "nine event" ,
+        startTime: "6:30",
+        endTime:"13:00",
+        allDay:false
+    },
+    { 
+        id: "11",
+        title: "event11",
+        startDate: new Date("1/14/2025"),
+        endDate: new Date("01/18/2025"),
+        description: "eleventh event" ,
+        startTime: "6:30",
+        endTime:"13:00",
+        allDay:false
     }
 ]
+
+const temp ={ 
+    id: "9",
+    title: "event9",
+    startDate: new Date("1/12/2025"),
+    description: "nine event" ,
+    startTime: "6:30",
+    endTime:"13:00",
+    allDay:false,
+    color:"#00ff00",
+    isStart:true,
+    isEnd:false,
+    isMultiDay:false
+}
+
+const startDate = new Date("1/12/2025")
+const endDate = new Date("1/16/2025")
+const temp1 =  dayjs(startDate).diff(dayjs(endDate), "days")

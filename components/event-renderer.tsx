@@ -1,5 +1,5 @@
 import { CalendarEventType, useEventStore } from "@/lib/store";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import React from "react";
 
 type EventRendererProps = {
@@ -16,24 +16,43 @@ export function EventRenderer({ date, view, events, hour }: EventRendererProps) 
   const filteredEvents = events.filter((event: CalendarEventType) => {
     const eventHour = parseInt(event.startTime.split(":")[0]);
     if (view === "month") {
-      return event.startDate.format("DD-MM-YY") === date.format("DD-MM-YY");
+      return event.startDate.format("DD-MM-YY") === date.format("DD-MM-YY")
+      // && event.startDate.format("DD-MM-YY") === event.endDate.format("DD-MM-YY");
     } else if (view === "week" || view === "day") {
       return event.startDate.hour() === hour && !event.allDay;
     }
     return false;
   });
+  
+  const sortedEvents = [...filteredEvents].sort((a, b) => {
+    const durationA = a.endDate.diff(a.startDate, "minute"); // Get duration in minutes
+    const durationB = b.endDate.diff(b.startDate, "minute");
+    return durationB - durationA; // Sort in descending order (longest first)
+  });
+  const noOfMutliDayEvents = ()=>{
+    const temp = events.filter((e: CalendarEventType) => {
+      return e.startDate.isBefore(date, "day") && e.endDate.isAfter(date, "day")
+      || e.startDate.isBefore(date, "day") && e.endDate.isSame(date, "day")
+      
+    });
+    return temp.length;
+  }
+  const singleDayEvents = events.filter((event) => 
+    event.startDate.format("DD-MM-YY") === event.endDate.format("DD-MM-YY")
+  );
 
-  // const filteredEvents = events.filter((event: CalendarEventType) => {
-  //   const eventHour = parseInt(event.startTime.split(":")[0]);
-  //   if (view === "month") {
-  //     return event.startDate.format("DD-MM-YY") === date.format("DD-MM-YY");
-  //   } else if (view === "week" || view === "day") {
-  //     return event.startDate.format("DD-MM-YY") === date.format("DD-MM-YY") && eventHour === hour;
-  //   }
-  //   return false;
-  // });
+  const multiDayEvents = events.filter((event) => {
+    return event.startDate.isBefore(date.endOf("day")) && event.endDate.isAfter(date.startOf("day"))
+    || event.startDate.isBefore(date.endOf("day")) && event.endDate.isSame(date.startOf("day"))
+  });
+  
+  // Sort events to position them correctly
+  multiDayEvents.sort((a, b) => a.startDate.diff(b.startDate));
+  
 
-  const noOfEvents = filteredEvents.length;
+  const occupiedRows: Record<string, number[]> = {};
+  
+  const noOfEvents = sortedEvents.length;
 
   return (
     <div
@@ -42,20 +61,32 @@ export function EventRenderer({ date, view, events, hour }: EventRendererProps) 
       }`}
     >
       {view === "month" &&
-        filteredEvents.slice(0, 4).map((event, index) => (
+        <>
+        
+        {sortedEvents.slice(0, 4).map((event, index) => {
+          //find difference in number of days between start and end date
+          const diffInDays = event.endDate.diff(event.startDate, "days")+1;
+          const topOffset = (noOfMutliDayEvents());
+          return (
           <div
             key={event.id}
             onClick={(e) => {
               e.stopPropagation();
               openEventSummary(event);
             }}
-            className={`z-10 my-[1px] line-clamp-1 max-sm:h-[12px] w-full m-0 flex justify-start 
+            style={{
+              width: `calc(${100*diffInDays}% + ${diffInDays}px)`,
+              marginTop:`${topOffset && index==0?topOffset*18+topOffset:0}px`
+            }}
+            className={`z-10 line-clamp-1 my-[1px]  max-sm:h-[12px] h-[18px]  m-0 flex justify-start 
               items-center cursor-pointer rounded-sm bg-blue-700 p-[1px] text-[7px] 
               sm:text-xs text-white`}
           >
             {event.title}
           </div>
-        ))}
+        )})}
+        </>
+        }
       {view === "month" && noOfEvents > 4 && (
         <div
           className="z-10 line-clamp-1 max-sm:h-[8px] w-full m-0 flex justify-start 
@@ -70,7 +101,7 @@ export function EventRenderer({ date, view, events, hour }: EventRendererProps) 
         </div>
       )}
       {view !== "month" &&
-        filteredEvents.map((event, index) => {
+        sortedEvents.map((event, index) => {
           // For week and day views, calculate height, width, and positioning
           const start = dayjs(
             `${dayjs(event.startDate).format("YYYY-MM-DD")} ${event.startTime}`,
