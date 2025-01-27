@@ -44,10 +44,8 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow}
       return row ? Math.max(max, row.rowIndex) : max;
     }, 0);
 
-
     maxRowIndex = isMultiDayEvent ? maxRowIndex+1 : 0;
     setStartRow(maxRowIndex);
-
      
     let index = maxRowIndex;
 
