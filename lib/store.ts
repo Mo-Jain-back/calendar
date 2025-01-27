@@ -44,6 +44,18 @@ interface ToggleSideBarType {
   setSideBarOpen: () => void;
 }
 
+type EventRow = { id: string; rowIndex: number };
+
+type EventStore1 = {
+  eventsRow: EventRow[];
+  setEventsRow: (eventsRow: EventRow[]) => void;
+};
+
+export const useEventRows = create<EventStore1>((set) => ({
+  eventsRow: [],
+  setEventsRow: (eventsRow) => set({ eventsRow }),
+}));
+
 export const useViewStore = create<ViewStoreType>()(
   devtools(
     persist(

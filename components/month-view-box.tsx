@@ -1,3 +1,4 @@
+"use client";
 import { useDateStore, useEventStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
@@ -8,11 +9,9 @@ import { EventRenderer } from "./event-renderer";
 export default function MonthViewBox({
   day,
   rowIndex,
-  eventsRow,
 }: {
   day: dayjs.Dayjs | null;
   rowIndex: number;
-  eventsRow: { id: string; rowIndex: number }[];
 }) {
   const { openPopover, events } = useEventStore();
 
@@ -58,7 +57,7 @@ export default function MonthViewBox({
           {isFirstDayOfMonth ? day.format("MMM D") : day.format("D")}
         </h4>
       </div>
-      <EventRenderer date={day} view="month" events={events} eventsRow={eventsRow} />
+      <EventRenderer date={day} view="month" events={events} />
     </div>
   );
 }

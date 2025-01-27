@@ -1,5 +1,5 @@
 "use client";
-import { CalendarEventType, useEventStore } from "@/lib/store";
+import { CalendarEventType, useEventRows, useEventStore } from "@/lib/store";
 import dayjs, { Dayjs } from "dayjs";
 import React, { use, useEffect, useState } from "react";
 
@@ -8,57 +8,63 @@ type EventRendererProps = {
   view: "month" | "week" | "day";
   events: CalendarEventType[];
   hour?: number;
-  eventsRow?: { id: string; rowIndex: number }[];
 };
 
-export function EventRenderer({ date, view, events, hour,eventsRow }: EventRendererProps) {
+export function EventRenderer({ date, view, events, hour}: EventRendererProps) {
   const { openEventSummary } = useEventStore();
   const [startRow, setStartRow] = useState<number>(0);
+  const {eventsRow, setEventsRow} = useEventRows();
 
   useEffect(() => {
     console.log("date", date.date());
-    console.log("events", events);
-    console.log("startRow", startRow);
     findStartRow();
-    addMultiDayEvents();
-    console.log("eventsRow", eventsRow);
-  }, [events,setStartRow]);
+    console.log("startRow is", startRow);
+  }, [date,events]);
 
   const findStartRow = () => {
+    const currentDate = date.startOf("day");
     let maxRowIndex = 0;
-    events.forEach((event) => {
-      if (eventsRow) {
-        if (
-          (event.startDate.isBefore(date, "day") && event.endDate.isAfter(date, "day")) ||
-          (event.startDate.isBefore(date, "day") && event.endDate.isSame(date, "day"))
-        ) {
-          console.log(".................................................");
-          const eventRow = eventsRow.find((e) => e.id === event.id);
-          console.log("eventRow", eventRow);
-          const rowIndex = eventRow ? eventRow.rowIndex : 0;
-          maxRowIndex = Math.max(maxRowIndex, rowIndex);
-        }
-      }
+    let isMultiDayEvent = false;
+    const extendedEvents = events.filter((event) => {
+      const eventStart = dayjs(event.startDate).startOf("day");
+      const eventEnd = dayjs(event.endDate).startOf("day");
+      return (eventStart.isBefore(currentDate) && eventEnd.isSame(currentDate) )
+      || eventStart.isBefore(currentDate) && eventEnd.isAfter(currentDate);
     });
-    console.log("rowIndex", maxRowIndex);
-    setStartRow(maxRowIndex);
-  };
+    
+    if(extendedEvents.length > 0){
+      isMultiDayEvent = true;
+    }
+    // Find the maximum row index from extended events
+    maxRowIndex = extendedEvents.reduce((max, event) => {
+      const row = eventsRow?.find((row) => row.id === event.id);
+      return row ? Math.max(max, row.rowIndex) : max;
+    }, 0);
 
-  const addMultiDayEvents = () => {
+    console.log("isMultiDayEvent",isMultiDayEvent);
+
+    maxRowIndex = isMultiDayEvent ? maxRowIndex+1 : 0;
+    console.log("maxRowIndex", maxRowIndex);
+    setStartRow(maxRowIndex);
+
+     
+    let index = maxRowIndex;
+    const newEventsRow = [...eventsRow];
+    
     events.forEach((event) => {
       if (event.startDate.isSame(date, "day") && event.endDate.isAfter(date, "day")) {
-        setStartRow((prevStartRow) => {
-          const newStartRow = prevStartRow + 1;
-          if (eventsRow) {
-            eventsRow.push({ id: event.id, rowIndex: newStartRow });
-            console.log("startRow", newStartRow);
-          }
-          return newStartRow;
-        });
+        newEventsRow.push({ id: event.id, rowIndex: index });
+        console.log("Index is", index);
+        index++;
       }
     });
-  };
 
+    console.log("newEventsRow", newEventsRow); 
+    setEventsRow([...newEventsRow]);
+    console.log("eventsRow",eventsRow)
+    setStartRow(index);
+    
+  };
 
   const filteredEvents = events.filter((event: CalendarEventType) => {
     const eventHour = parseInt(event.startTime.split(":")[0]);
@@ -76,6 +82,9 @@ export function EventRenderer({ date, view, events, hour,eventsRow }: EventRende
     const durationB = b.endDate.diff(b.startDate, "minute");
     return durationB - durationA; // Sort in descending order (longest first)
   });
+
+ 
+  
   const noOfMutliDayEvents = ()=>{
     const temp = events.filter((e: CalendarEventType) => {
       return e.startDate.isBefore(date, "day") && e.endDate.isAfter(date, "day")
@@ -128,7 +137,7 @@ export function EventRenderer({ date, view, events, hour,eventsRow }: EventRende
               items-center cursor-pointer rounded-sm bg-blue-700 p-[1px] text-[7px] 
               sm:text-xs text-white`}
           >
-            {event.title}
+            {event.title} + {startRow}
           </div>
         )})}
         </>
