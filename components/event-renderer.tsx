@@ -2,24 +2,30 @@
 import { CalendarEventType, useEventRows, useEventStore } from "@/lib/store";
 import dayjs, { Dayjs } from "dayjs";
 import React, { use, useEffect, useState } from "react";
+import { useMediaQuery } from 'react-responsive';
 
-type EventRendererProps = {
+interface EventRendererProps  {
   date: dayjs.Dayjs;
   view: "month" | "week" | "day";
   events: CalendarEventType[];
   hour?: number;
+  eventsRow: { id: string; rowIndex: number }[];
+  setEventsRow: React.Dispatch<React.SetStateAction<{ id: string; rowIndex: number }[]>>;
 };
 
-export function EventRenderer({ date, view, events, hour}: EventRendererProps) {
+export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow}: EventRendererProps) {
   const { openEventSummary } = useEventStore();
   const [startRow, setStartRow] = useState<number>(0);
-  const {eventsRow, setEventsRow} = useEventRows();
+  const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
+  // const {eventsRow, setEventsRow} = useEventRows();
 
   useEffect(() => {
     console.log("date", date.date());
     findStartRow();
     console.log("startRow is", startRow);
   }, [date,events]);
+
+ 
 
   const findStartRow = () => {
     const currentDate = date.startOf("day");
@@ -49,7 +55,9 @@ export function EventRenderer({ date, view, events, hour}: EventRendererProps) {
 
      
     let index = maxRowIndex;
-    const newEventsRow = [...eventsRow];
+
+    console.log("Inital events row", eventsRow);
+    const newEventsRow = eventsRow || [];
     
     events.forEach((event) => {
       if (event.startDate.isSame(date, "day") && event.endDate.isAfter(date, "day")) {
@@ -60,9 +68,11 @@ export function EventRenderer({ date, view, events, hour}: EventRendererProps) {
     });
 
     console.log("newEventsRow", newEventsRow); 
-    setEventsRow([...newEventsRow]);
+    //below line is not updating the state
+    // eventsRow = newEventsRow;
+    setEventsRow(newEventsRow);
     console.log("eventsRow",eventsRow)
-    setStartRow(index);
+    setStartRow(maxRowIndex);
     
   };
 
@@ -121,7 +131,7 @@ export function EventRenderer({ date, view, events, hour}: EventRendererProps) {
         {sortedEvents.slice(0, 4).map((event, index) => {
           //find difference in number of days between start and end date
           const diffInDays = event.endDate.diff(event.startDate, "days")+1;
-          const topOffset = (noOfMutliDayEvents());
+          
           return (
           <div
             key={event.id}
@@ -130,22 +140,22 @@ export function EventRenderer({ date, view, events, hour}: EventRendererProps) {
               openEventSummary(event);
             }}
             style={{
-              width: `calc(${100*diffInDays}% + ${diffInDays}px)`,
-              marginTop:`${topOffset && index==0?topOffset*18+topOffset:0}px`
+              width: `calc(${100*diffInDays}% + ${diffInDays*2}px)`,
+              marginTop: `${index === 0 ? (isSmallScreen ? startRow * 12 : startRow * 18) + startRow : 0}px`,
             }}
-            className={`z-10 line-clamp-1 my-[1px]  max-sm:h-[12px] h-[18px]  m-0 flex justify-start 
+            className={`z-10 line-clamp-1 my-[1px]  max-sm:h-[12px] h-[18px] mt-[${index==0?startRow*18+startRow:0}px] flex justify-start 
               items-center cursor-pointer rounded-sm bg-blue-700 p-[1px] text-[7px] 
               sm:text-xs text-white`}
           >
-            {event.title} + {startRow}
+            {event.title}
           </div>
         )})}
         </>
         }
       {view === "month" && noOfEvents > 4 && (
         <div
-          className="z-10 line-clamp-1 max-sm:h-[8px] w-full m-0 flex justify-start 
-            items-center cursor-pointer rounded-sm bg-gray-300 text-[7px] lg:text-xs lg:p-[2px]
+          className="z-10 line-clamp-1 h-[18px] max-sm:h-[12px] w-full m-0 flex justify-start 
+            items-center cursor-pointer rounded-sm bg-gray-300 text-[7px] sm:text-xs p-[2px]
              text-gray-700"
           onClick={(e) => {
             e.stopPropagation();
