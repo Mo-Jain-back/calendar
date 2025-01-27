@@ -116,44 +116,74 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow}
     >
       {view === "month" &&
         <>
-        
-        {sortedEvents.slice(0, 4).map((event, index) => {
-          //find difference in number of days between start and end date
-          const diffInDays = event.endDate.diff(event.startDate, "days")+1;
-          
-          return (
-          <div
-            key={event.id}
-            onClick={(e) => {
-              e.stopPropagation();
-              openEventSummary(event);
-            }}
-            style={{
-              width: `calc(${100*diffInDays}% + ${diffInDays*2}px)`,
-              marginTop: `${index === 0 ? (isSmallScreen ? startRow * 12 : startRow * 18) + startRow : 0}px`,
-            }}
-            className={`z-10 line-clamp-1 my-[1px]  max-sm:h-[12px] h-[18px] mt-[${index==0?startRow*18+startRow:0}px] flex justify-start 
-              items-center cursor-pointer rounded-sm bg-blue-700 p-[1px] text-[7px] 
-              sm:text-xs text-white`}
-          >
-            {event.title}
-          </div>
-        )})}
-        </>
+        {startRow+noOfEvents<=5 ?
+          <> 
+            {sortedEvents.map((event, index) => {
+              //find difference in number of days between start and end date
+              const weekEnd = event.startDate.endOf("week");
+              const diffFromWeekEnd = weekEnd.diff(event.startDate, "days")+1;
+              const diffInDays = event.endDate.diff(event.startDate, "days")+1;
+              return (
+              <div
+                key={event.id}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openEventSummary(event);
+                }}
+                style={{
+                  width: `calc(${100*Math.min(diffInDays,diffFromWeekEnd)}% + ${Math.min(diffInDays,diffFromWeekEnd)*2}px)`,
+                  marginTop: `${index === 0 ? (isSmallScreen ? startRow * 12 : startRow * 18) + startRow : 0}px`,
+                }}
+                className={`z-10 line-clamp-1 my-[1px]  max-sm:h-[12px] h-[18px] mt-[${index==0?startRow*18+startRow:0}px] flex justify-start 
+                  items-center cursor-pointer rounded-sm bg-[#039BE5] font-semibold p-[1px] text-[7px] 
+                  sm:text-xs text-white`}
+              >
+                {event.title} 
+              </div>
+            )})}
+          </>
+          :
+          <>
+            {sortedEvents.slice(0, 4-startRow).map((event, index) => {
+              //find difference in number of days between start and end date
+              const weekEnd = event.startDate.endOf("week");
+              const diffFromWeekEnd = weekEnd.diff(event.startDate, "days")+1;
+              const diffInDays = event.endDate.diff(event.startDate, "days")+1;
+              return (
+              <div
+                key={event.id}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openEventSummary(event);
+                }}
+                style={{
+                  width: `calc(${100*Math.min(diffInDays,diffFromWeekEnd)}% + ${Math.min(diffInDays,diffFromWeekEnd)*2}px)`,
+                  marginTop: `${index === 0 ? (isSmallScreen ? startRow * 12 : startRow * 18) + startRow : 0}px`,
+                }}
+                className={`z-10 line-clamp-1 my-[1px]  max-sm:h-[12px] h-[18px] mt-[${index==0?startRow*18+startRow:0}px] flex justify-start 
+                  items-center cursor-pointer rounded-sm bg-[#039BE5] font-semibold p-[1px] text-[7px] 
+                  sm:text-xs text-white`}
+              >
+                {event.title}
+              </div>
+            )})}
+          </>
         }
-      {view === "month" && noOfEvents > 4 && (
+      { startRow+noOfEvents > 5 && (
         <div
           className="z-10 line-clamp-1 h-[18px] max-sm:h-[12px] w-full m-0 flex justify-start 
-            items-center cursor-pointer rounded-sm bg-gray-300 text-[7px] sm:text-xs p-[2px]
-             text-gray-700"
+            items-center cursor-pointer rounded-sm hover:bg-gray-300 text-[7px] font-semibold sm:text-xs p-[2px]
+             text-gray-700 px-1"
           onClick={(e) => {
             e.stopPropagation();
             // Add logic to open a modal or show more events for the day
           }}
         >
-          {`+${noOfEvents - 4} more`}
+          {`${startRow+noOfEvents - 4} more`}
         </div>
       )}
+      </>
+        }
       {view !== "month" &&
         sortedEvents.map((event, index) => {
           // For week and day views, calculate height, width, and positioning
@@ -193,7 +223,7 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow}
                 top: `${topOffset}px`,
               }}
               className={`absolute z-10 mx-[1px] line-clamp-1 max-sm:h-[12px] m-0 flex justify-start 
-                items-center cursor-pointer rounded-sm bg-blue-700 p-[2px] text-[7px] 
+                items-center cursor-pointer rounded-sm bg-[#039BE5] font-bold p-[2px] text-[7px] 
                 sm:text-sm text-white`}
             >
               {noOfEvents < 3 || view === "day" ? event.title : ""}

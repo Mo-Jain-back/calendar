@@ -106,12 +106,22 @@ export const eventsData = [
         id: "11",
         title: "event11",
         startDate: new Date("1/14/2025"),
-        endDate: new Date("01/18/2025"),
+        endDate: new Date("01/19/2025"),
         description: "eleventh event" ,
         startTime: "6:30",
         endTime:"13:00",
         allDay:false
-    }
+    },
+    { 
+        id: "12",
+        title: "event12",
+        startDate: new Date("1/16/2025"),
+        endDate: new Date("01/16/2025"),
+        description: "twelvth event" ,
+        startTime: "6:30",
+        endTime:"13:00",
+        allDay:false
+    },
 ]
 
 const temp ={ 
