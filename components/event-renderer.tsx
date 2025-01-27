@@ -9,8 +9,8 @@ interface EventRendererProps  {
   view: "month" | "week" | "day";
   events: CalendarEventType[];
   hour?: number;
-  eventsRow: { id: string; rowIndex: number }[];
-  setEventsRow: React.Dispatch<React.SetStateAction<{ id: string; rowIndex: number }[]>>;
+  eventsRow?: { id: string; rowIndex: number }[];
+  setEventsRow?: React.Dispatch<React.SetStateAction<{ id: string; rowIndex: number }[]>>;
 };
 
 export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow}: EventRendererProps) {
@@ -70,7 +70,7 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow}
     console.log("newEventsRow", newEventsRow); 
     //below line is not updating the state
     // eventsRow = newEventsRow;
-    setEventsRow(newEventsRow);
+    setEventsRow && setEventsRow(newEventsRow);
     console.log("eventsRow",eventsRow)
     setStartRow(maxRowIndex);
     
