@@ -17,12 +17,9 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow}
   const { openEventSummary } = useEventStore();
   const [startRow, setStartRow] = useState<number>(0);
   const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
-  // const {eventsRow, setEventsRow} = useEventRows();
 
   useEffect(() => {
-    console.log("date", date.date());
     findStartRow();
-    console.log("startRow is", startRow);
   }, [date,events]);
 
  
@@ -47,31 +44,25 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow}
       return row ? Math.max(max, row.rowIndex) : max;
     }, 0);
 
-    console.log("isMultiDayEvent",isMultiDayEvent);
 
     maxRowIndex = isMultiDayEvent ? maxRowIndex+1 : 0;
-    console.log("maxRowIndex", maxRowIndex);
     setStartRow(maxRowIndex);
 
      
     let index = maxRowIndex;
 
-    console.log("Inital events row", eventsRow);
     const newEventsRow = eventsRow || [];
     
     events.forEach((event) => {
       if (event.startDate.isSame(date, "day") && event.endDate.isAfter(date, "day")) {
         newEventsRow.push({ id: event.id, rowIndex: index });
-        console.log("Index is", index);
         index++;
       }
     });
 
-    console.log("newEventsRow", newEventsRow); 
     //below line is not updating the state
     // eventsRow = newEventsRow;
     setEventsRow && setEventsRow(newEventsRow);
-    console.log("eventsRow",eventsRow)
     setStartRow(maxRowIndex);
     
   };
