@@ -3,6 +3,7 @@ import { useDateStore, useToggleSideBarStore, useViewStore } from "@/lib/store";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import SideBarCalendar from "../sidebar/side-bar-calendar";
+import { useMediaQuery } from "react-responsive";
 
 const DateButtons = ({open}:{open:boolean}) => {
     const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Nov","Dec"];
@@ -11,6 +12,7 @@ const DateButtons = ({open}:{open:boolean}) => {
         useDateStore();
     const [selectedMonth,setSelectedMonth] = useState(todaysDate.format("MMM"));
     const { selectedView } = useViewStore();
+    const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' }); 
 
     useEffect(() => {
         setSelectedMonth(months[selectedMonthIndex]);
@@ -29,7 +31,7 @@ const DateButtons = ({open}:{open:boolean}) => {
     return (
         <>
           {
-            open &&
+            isSmallScreen && open &&
             <>
               <div >
                 {selectedView != "month" &&
