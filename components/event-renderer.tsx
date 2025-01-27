@@ -11,18 +11,52 @@ interface EventRendererProps  {
   hour?: number;
   eventsRow?: { id: string; rowIndex: number }[];
   setEventsRow?: React.Dispatch<React.SetStateAction<{ id: string; rowIndex: number }[]>>;
+    wrappedEvents?: { id:string; date:Dayjs; rowIndex:number;}[];
+    setWrappedEvents?: React.Dispatch<React.SetStateAction<{ id:string; date:Dayjs;rowIndex:number;}[]>>;
 };
 
-export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow}: EventRendererProps) {
+export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow,wrappedEvents,setWrappedEvents}: EventRendererProps) {
   const { openEventSummary } = useEventStore();
   const [startRow, setStartRow] = useState<number>(0);
   const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
 
   useEffect(() => {
     findStartRow();
+    addWrappedEvents();
   }, [date,events]);
 
- 
+  const filteredEvents = events.filter((event: CalendarEventType) => {
+    const eventHour = parseInt(event.startTime.split(":")[0]);
+    if (view === "month") {
+      return event.startDate.format("DD-MM-YY") === date.format("DD-MM-YY")
+      // && event.startDate.format("DD-MM-YY") === event.endDate.format("DD-MM-YY");
+    } else if (view === "week" || view === "day") {
+      return event.startDate.hour() === hour && !event.allDay;
+    }
+    return false;
+  });
+  
+  const sortedEvents = [...filteredEvents].sort((a, b) => {
+    const durationA = a.endDate.diff(a.startDate, "minute"); // Get duration in minutes
+    const durationB = b.endDate.diff(b.startDate, "minute");
+    return durationB - durationA; // Sort in descending order (longest first)
+  });
+
+  const addWrappedEvents = () => {
+    const newWrappedEvents = wrappedEvents || [];
+    filteredEvents.forEach((event) => {
+      const weekEnd = event.startDate.endOf("week");
+      const diffFromWeekEnd = weekEnd.diff(event.startDate, "days");
+      const diffInDays = event.endDate.diff(event.startDate, "days");
+      if(diffInDays>diffFromWeekEnd){
+        newWrappedEvents.push({ id: event.id, date: weekEnd.add(1, "day"), rowIndex: 0 });
+      }
+    });
+    
+    setWrappedEvents && setWrappedEvents(newWrappedEvents);
+    console.log("wrappedEvents",wrappedEvents);
+  }
+  
 
   const findStartRow = () => {
     const currentDate = date.startOf("day");
@@ -64,24 +98,6 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow}
     setStartRow(maxRowIndex);
     
   };
-
-  const filteredEvents = events.filter((event: CalendarEventType) => {
-    const eventHour = parseInt(event.startTime.split(":")[0]);
-    if (view === "month") {
-      return event.startDate.format("DD-MM-YY") === date.format("DD-MM-YY")
-      // && event.startDate.format("DD-MM-YY") === event.endDate.format("DD-MM-YY");
-    } else if (view === "week" || view === "day") {
-      return event.startDate.hour() === hour && !event.allDay;
-    }
-    return false;
-  });
-  
-  const sortedEvents = [...filteredEvents].sort((a, b) => {
-    const durationA = a.endDate.diff(a.startDate, "minute"); // Get duration in minutes
-    const durationB = b.endDate.diff(b.startDate, "minute");
-    return durationB - durationA; // Sort in descending order (longest first)
-  });
-
  
   
   const noOfMutliDayEvents = ()=>{
@@ -110,12 +126,40 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow}
 
   return (
     <div
-      className={` w-full ${
+      className={` w-full relative ${
         view === "month" ? "flex flex-col" : "flex"
       }`}
     >
       {view === "month" &&
         <>
+        {
+          wrappedEvents?.map((e) => {
+              // return null;
+              const event = events.find((event) => event.id === e.id);
+              if(!event || !e.date.isSame(date,"day")) return null;
+              const weekEnd = event.startDate.endOf("week");
+              const diffFromWeekEnd = weekEnd.diff(event.startDate, "days")+1;
+              const diffInDays = event.endDate.diff(event.startDate, "days")+1;
+              return (
+                <div
+                  key={event.id}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openEventSummary(event);
+                  }}
+                  style={{
+                    width: `calc(${100*(diffInDays-diffFromWeekEnd)}% + ${(diffInDays-diffFromWeekEnd)*2}px)`,
+                    top: `${isSmallScreen ? startRow * 12 : startRow * 18}px`,
+                  }}
+                  className={`absoulte z-10 line-clamp-1 my-[1px]  max-sm:h-[12px] h-[18px]  flex justify-start 
+                    items-center cursor-pointer rounded-sm bg-[#039BE5] font-semibold p-[1px] text-[7px] 
+                    sm:text-xs text-white`}
+                >
+                  {event.title}
+                </div>
+            )
+          })
+        }
         {startRow+noOfEvents<=5 ?
           <> 
             {sortedEvents.map((event, index) => {
