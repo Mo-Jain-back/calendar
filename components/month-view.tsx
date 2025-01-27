@@ -12,6 +12,7 @@ export type EventsRow = {
 export type WrappedEvents = {
   id:string;
   date:Dayjs;
+  endDate:Dayjs;
   rowIndex:number;
 }
 export default function MonthView() {

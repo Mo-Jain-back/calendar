@@ -18,8 +18,8 @@ export default function MonthViewBox({
   rowIndex: number;
   eventsRow: { id:string; rowIndex:number;}[];
   setEventsRow: React.Dispatch<React.SetStateAction<{ id:string; rowIndex:number;}[]>>;
-  wrappedEvents: { id:string; date:Dayjs; rowIndex:number;}[];
-  setWrappedEvents: React.Dispatch<React.SetStateAction<{ id:string; date:Dayjs;rowIndex:number;}[]>>;
+  wrappedEvents: { id:string; date:Dayjs; endDate:Dayjs;rowIndex:number;}[];
+  setWrappedEvents: React.Dispatch<React.SetStateAction<{ id:string; date:Dayjs; endDate:Dayjs;rowIndex:number;}[]>>;
 }) {
   const { openPopover, events } = useEventStore();
 
