@@ -17,34 +17,39 @@ interface EventRendererProps  {
 
 export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow,wrappedEvents,setWrappedEvents}: EventRendererProps) {
   const { openEventSummary } = useEventStore();
-  const [startRow, setStartRow] = useState<number>(0);
   const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
-  console.log("date",date.date());
+  const [emptyRows,setEmptyRows] = useState<number[]>([0,1,2,3,4]);
+  const [isWrapped, setIsWrapped] = useState<boolean>(false);
+  const [sortedEvents, setSortedEvents] = useState<CalendarEventType[]>([]);
 
   useEffect(() => {
-    findStartRow();
-    addWrappedEvents();
+    Initialize();
   }, [date,events]);
 
-  const filteredEvents = events.filter((event: CalendarEventType) => {
-    if (view === "month") {
-      return event.startDate.format("DD-MM-YY") === date.format("DD-MM-YY")
-      // && event.startDate.format("DD-MM-YY") === event.endDate.format("DD-MM-YY");
-    } else if (view === "week" || view === "day") {
-      return event.startDate.hour() === hour && !event.allDay;
-    }
-    return false;
-  });
-  
-  const sortedEvents = [...filteredEvents].sort((a, b) => {
-    const durationA = a.endDate.diff(a.startDate, "minute"); // Get duration in minutes
-    const durationB = b.endDate.diff(b.startDate, "minute");
-    return durationB - durationA; // Sort in descending order (longest first)
-  });
+  const noOfEvents = emptyRows.length -  sortedEvents.length;
 
-  const addWrappedEvents = () => {
+  const Initialize = () => {
+
+    const filteredEvents = events.filter((event: CalendarEventType) => {
+      if (view === "month") {
+        return event.startDate.format("DD-MM-YY") === date.format("DD-MM-YY")
+        // && event.startDate.format("DD-MM-YY") === event.endDate.format("DD-MM-YY");
+      } else if (view === "week" || view === "day") {
+        return event.startDate.hour() === hour && !event.allDay;
+      }
+      return false;
+    });
+    
+    const newSortedEvents = [...filteredEvents].sort((a, b) => {
+      const durationA = a.endDate.diff(a.startDate, "minute"); // Get duration in minutes
+      const durationB = b.endDate.diff(b.startDate, "minute");
+      return durationB - durationA; // Sort in descending order (longest first)
+    });
+
+    setSortedEvents(newSortedEvents);
+
     const newWrappedEvents = wrappedEvents || [];
-    filteredEvents.forEach((event) => {
+    newSortedEvents.forEach((event) => {
       const weekEnd = event.startDate.endOf("week");
       const diffFromWeekEnd = weekEnd.diff(event.startDate, "days");
       const diffInDays = event.endDate.diff(event.startDate, "days");
@@ -55,87 +60,59 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow,
     });
         
     setWrappedEvents && setWrappedEvents(newWrappedEvents);
-  }
-  
-  const currentDate = date.startOf("day");
+    const currentDate = date.startOf("day");
 
-  const extendedEvents = events.filter((event) => {
-    const eventStart = dayjs(event.startDate).startOf("day");
-    const eventEnd = dayjs(event.endDate).startOf("day");
-    return (eventStart.isBefore(currentDate) && eventEnd.isSame(currentDate))
-    || (eventStart.isBefore(currentDate) && eventEnd.isAfter(currentDate));
-  });
+    const extendedEvents = events.filter((event) => {
+      const eventStart = dayjs(event.startDate).startOf("day");
+      const eventEnd = dayjs(event.endDate).startOf("day");
+      return (eventStart.isBefore(currentDate) && eventEnd.isSame(currentDate))
+      || (eventStart.isBefore(currentDate) && eventEnd.isAfter(currentDate));
+    });
 
-  console.log("extendedEvents",extendedEvents);
-  console.log("eventsRow" ,eventsRow);
-
-  let filledRows:number[] = [];
-  extendedEvents.forEach((event) => {
-    const eventRow = eventsRow?.find(e => e.id === event.id);
-    //find eventRow in wrappedEvents
-    const wrappedEvent = wrappedEvents?.find(e => e.id === eventRow?.id);
-    if(eventRow && (!wrappedEvent || wrappedEvent.date.isAfter(date,"day"))) {
-      filledRows.push(eventRow.rowIndex);
-    }
-  });
-
-  let index=0;
-  wrappedEvents?.forEach((event) => {
-    if(event.date.isBefore(date,"day") && event.endDate.isAfter(date,"day")){
-      filledRows.push(index);
-      index++;
-    }
-  });
-  console.log("filledRows",filledRows);
-
-  const rows=  [0,1,2,3,4]
-  const emptyRows = rows.filter(row => !filledRows.includes(row));
-  console.log("emptyRows",emptyRows);
-  const noOfEvents = emptyRows.length -  sortedEvents.length;
-
-  const findStartRow = () => {
-    let maxRowIndex = 0;
-    let isMultiDayEvent = false;    
-    if(extendedEvents.length > 0){
-      isMultiDayEvent = true;
-    }
-    // Find the maximum row index from extended events
-    maxRowIndex = extendedEvents.reduce((max, event) => {
-      const row = eventsRow?.find((row) => row.id === event.id);
-      const wrappedEvent = wrappedEvents?.find(e => e.id === row?.id);
-      let rowIndex = row?.rowIndex;
-      if(wrappedEvent && wrappedEvent.date.isBefore(date,"day")){
-        rowIndex = wrappedEvent.rowIndex;
+    let filledRows:number[] = [];
+    let index=0;
+    extendedEvents.forEach((event) => {
+      const eventRow = eventsRow?.find(e => e.id === event.id);
+      //find eventRow in wrappedEvents
+      if(!eventRow) return;
+      const wrappedEvent = wrappedEvents?.find(e => e.id === eventRow?.id);
+      if(wrappedEvent){
+        if((wrappedEvent.date.isBefore(date,"day") && wrappedEvent.endDate.isAfter(date,"day"))|| wrappedEvent.endDate.isSame(date,"day") || wrappedEvent.date.isSame(date,"day") ){
+          if(wrappedEvent.date.isSame(date,"day")){
+            setIsWrapped(true);
+          }
+          filledRows.push(index);
+          index++;
+        }
+        else{
+          filledRows.push(eventRow.rowIndex);
+        }
       }
-      return row ? Math.max(max, row.rowIndex) : max;
-    }, 0);
+      else{
+        filledRows.push(eventRow.rowIndex);
+      }
+    });
 
-    maxRowIndex = isMultiDayEvent ? maxRowIndex+1 : 0;
+    const rows=  [0,1,2,3,4]
+    const newEmptyRows = rows.filter(row => !filledRows.includes(row));
+    console.log("newEmptyRows",newEmptyRows);
+    setEmptyRows((prev)=>{
+      return newEmptyRows;
+    });
 
-
-    setStartRow(maxRowIndex);
-
-    
-     
-    let index = 0;
-
+    index = 0;
     const newEventsRow = eventsRow || [];
-
-    sortedEvents.forEach((event) => {
+    newSortedEvents.forEach((event) => {
       if (event.startDate.isSame(date, "day") && event.endDate.isAfter(date, "day")) {
         console.log("date",date.date());
         
-        console.log("emptyRows[index]....",emptyRows[index]);
-        newEventsRow.push({ id: event.id, rowIndex: emptyRows[index] });
+        console.log("newEmptyRows[index]....",newEmptyRows[index]);
+        newEventsRow.push({ id: event.id, rowIndex: newEmptyRows[index] });
         index++;
       }
     });
 
-    //below line is not updating the state
-    // eventsRow = newEventsRow;
-    setEventsRow && setEventsRow(newEventsRow);
-    setStartRow(maxRowIndex);
-    
+    setEventsRow && setEventsRow(newEventsRow);    
   };
 
   
@@ -166,7 +143,7 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow,
                   style={{
                     width: `calc(${100*(diffInDays-diffFromWeekEnd)}% + ${(diffInDays-diffFromWeekEnd)*2}px)`,
                   }}
-                  className={`z-10 line-clamp-1 my-[1px]  max-sm:h-[12px] h-[18px]  flex justify-start 
+                  className={`z-10 line-clamp-1 mb-[1px] max-sm:h-[12px] h-[18px]  flex justify-start 
                     items-center cursor-pointer rounded-sm bg-[#039BE5] font-semibold p-[1px] text-[7px] 
                     sm:text-xs text-white`}
                 >
@@ -183,6 +160,8 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow,
               const weekEnd = event.startDate.endOf("week");
               const diffFromWeekEnd = weekEnd.diff(event.startDate, "days")+1;
               const diffInDays = event.endDate.diff(event.startDate, "days")+1;
+              console.log("date",date.date());
+              console.log("emptyRows",emptyRows);
               let temp = emptyRows[index];
               let cnt = 0;
               while(temp > 0){
@@ -193,6 +172,10 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow,
                 temp--;
                 if(emptyRows[index-1] == temp) break;
                 cnt++;
+              }
+
+              if(index==0 && isWrapped){
+                cnt = 0;
               }
               
               return (
@@ -206,7 +189,7 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow,
                   width: `calc(${100*Math.min(diffInDays,diffFromWeekEnd)}% + ${Math.min(diffInDays,diffFromWeekEnd)*1}px)`,
                   marginTop: `${isSmallScreen ? cnt * 13 : cnt * 19}px`,
                 }}
-                className={`z-10 line-clamp-1 my-[1px]  max-sm:h-[12px] h-[18px] mt-[${index==0?startRow*18+startRow:0}px] flex justify-start 
+                className={`z-10 line-clamp-1 my-[1px]  max-sm:h-[12px] h-[18px] flex justify-start 
                   items-center cursor-pointer rounded-sm bg-[#039BE5] font-semibold p-[1px] text-[7px] 
                   sm:text-xs text-white`}
               >
@@ -216,7 +199,7 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow,
           </>
           :
           <>
-            {sortedEvents.slice(0, emptyRows.length).map((event, index) => {
+            {sortedEvents.slice(0, emptyRows.length-1).map((event, index) => {
               //find difference in number of days between start and end date
               const weekEnd = event.startDate.endOf("week");
               const diffFromWeekEnd = weekEnd.diff(event.startDate, "days")+1;
@@ -232,6 +215,10 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow,
                 if(emptyRows[index-1] == temp) break;
                 cnt++;
               }
+
+              if(index==0 && isWrapped){
+                cnt = 0;
+              }
               return (
               <div
                 key={event.id}
@@ -243,7 +230,7 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow,
                   width: `calc(${100*Math.min(diffInDays,diffFromWeekEnd)}% + ${Math.min(diffInDays,diffFromWeekEnd)*1}px)`,
                   marginTop: `${isSmallScreen ? cnt * 13 : cnt * 19}px`,
                 }}
-                className={`z-10 line-clamp-1 my-[1px]  max-sm:h-[12px] h-[18px] mt-[${index==0?startRow*18+startRow:0}px] flex justify-start 
+                className={`z-10 line-clamp-1 my-[1px]  max-sm:h-[12px] h-[18px] flex justify-start 
                   items-center cursor-pointer rounded-sm bg-[#039BE5] font-semibold p-[1px] text-[7px] 
                   sm:text-xs text-white`}
               >
