@@ -47,19 +47,26 @@ export function EventRenderer({ date, view, events, hour}: EventRendererProps) {
 
     const newWrappedEvents = wrappedEvents || [];
     newSortedEvents.forEach((event) => {
-      const weekEnd = event.startDate.endOf("week");
-      const weekendDuration = weekEnd.diff(event.startDate, "days");
-      const eventDuration = event.endDate.diff(event.startDate, "days");
       const newEventsRow = eventsRow || [];
-      const isPresent = newEventsRow.find(e => e.id === event.id);
+      let isPresent = newEventsRow.find(e => e.id === event.id);
+      let startDate = event.startDate.startOf("day");
+      const endDate = event.endDate.startOf("day");
+      let weekEnd = startDate.endOf("week").startOf("day");
+      let weekendDuration = weekEnd.diff(startDate, "days");
+      let eventDuration = endDate.diff(startDate, "days");
+      if(eventDuration < weekendDuration || isPresent ) return;
+
+      while (!startDate.isAfter(endDate)) {
+        startDate = weekEnd.add(1, "day").startOf("day");
+        if(startDate.isAfter(endDate)) break;
+        weekEnd = startDate.endOf("week").startOf("day");
+        weekendDuration = weekEnd.diff(startDate, "days");
+        eventDuration = endDate.diff(startDate, "days");
+        const endDate1 = weekEnd.isAfter(event.endDate,"day") 
+                  ? event.endDate.startOf("day") 
+                  : weekEnd;
     
-      const startDate = weekEnd.add(1, "day").startOf("day");
-      const endDate = startDate.endOf("week").isAfter(event.endDate, "day") 
-        ? event.endDate.startOf("day") 
-        : startDate.endOf("week").startOf("day");
-    
-      if (eventDuration > weekendDuration && !isPresent) {
-        newWrappedEvents.push({ id: event.id, startDate, endDate});
+        newWrappedEvents.push({ id: event.id, startDate, endDate: endDate1 });
       }
     });
     console.log("newWrappedEvents",newWrappedEvents);
@@ -174,7 +181,7 @@ export function EventRenderer({ date, view, events, hour}: EventRendererProps) {
 
   return (
     <div
-      className={` w-full relative ${
+      className={` w-full relative flex flex-col justify-center h-full ${
         view === "month" ? "flex flex-col" : "flex"
       }`}
     >
@@ -185,6 +192,7 @@ export function EventRenderer({ date, view, events, hour}: EventRendererProps) {
               // return null;
               const event = events.find((event) => event.id === e.id);
               if(!event || !e.startDate.isSame(date,"day")) return null;
+              console.log('events',e)
               const {width,marginTop} = findOffset(index,e,true);
               return renderEvent(event,index,width,marginTop);
           })

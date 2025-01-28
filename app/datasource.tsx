@@ -231,6 +231,17 @@ export const eventsData = [
         startTime: "6:30",
         endTime:"13:00",
         allDay:false
+    },
+    ,
+    { 
+        id: "24",
+        title: "Event24",
+        startDate: new Date("1/2/2025"),
+        endDate: new Date("01/2/2025"),
+        description: "sixteen event" ,
+        startTime: "6:30",
+        endTime:"13:00",
+        allDay:false
     }
 ]
 
