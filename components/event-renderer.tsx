@@ -115,7 +115,28 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow,
     setEventsRow && setEventsRow(newEventsRow);    
   };
 
-  const findOffset  = (index:number,event:CalendarEventType) => {
+  const renderEvent = (event:CalendarEventType,index:number,width:string,marginTop:string|number) => {
+    return (
+      <div
+        key={event.id}
+        onClick={(e) => {
+          e.stopPropagation();
+          openEventSummary(event);
+        }}
+        style={{
+          width,
+          marginTop
+        }}
+        className={`z-10 line-clamp-1 my-[1px]  max-sm:h-[12px] h-[18px] flex justify-start 
+          items-center cursor-pointer rounded-sm bg-[#039BE5] font-semibold p-[1px] text-[7px] 
+          sm:text-xs text-white`}
+      >
+        {event.title}
+      </div>
+    );
+  }
+
+  const findOffset  = (index:number,event:CalendarEventType,isWrap:boolean=false) => {
     const weekEnd = event.startDate.endOf("week");
     const diffFromWeekEnd = weekEnd.diff(event.startDate, "days")+1;
     const diffInDays = event.endDate.diff(event.startDate, "days")+1;
@@ -136,9 +157,13 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow,
     if(index==0 && isWrapped){
       cnt = 0;
     }
-
-    const width = `calc((100% + 1px)*${Math.min(diffInDays,diffFromWeekEnd)})`;
-    const marginTop = `${isSmallScreen ? cnt * 13 : cnt * 19}px`;
+    
+    let width = `calc((100% + 1px)*${Math.min(diffInDays,diffFromWeekEnd)})`;
+    let marginTop = `${isSmallScreen ? cnt * 13 : cnt * 19}px`;
+    if(isWrap){
+      width=`calc((100% + 1px)*${diffInDays-diffFromWeekEnd})`
+      marginTop = "0"
+    }
     return {width,marginTop};
   }
 
@@ -153,80 +178,29 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow,
       {view === "month" &&
         <>
         {
-          wrappedEvents?.map((e) => {
+          wrappedEvents?.map((e,index) => {
               // return null;
               const event = events.find((event) => event.id === e.id);
               if(!event || !e.date.isSame(date,"day")) return null;
-              const weekEnd = event.startDate.endOf("week");
-              const diffFromWeekEnd = weekEnd.diff(event.startDate, "days")+1;
-              const diffInDays = event.endDate.diff(event.startDate, "days")+1;
-              return (
-                <div
-                  key={event.id}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    openEventSummary(event);
-                  }}
-                  style={{
-                    width: `calc((100% + 1px)*${diffInDays-diffFromWeekEnd})`,
-                  }}
-                  className={`z-10 line-clamp-1 mb-[1px] max-sm:h-[12px] h-[18px]  flex justify-start 
-                    items-center cursor-pointer rounded-sm bg-[#039BE5] font-semibold p-[1px] text-[7px] 
-                    sm:text-xs text-white`}
-                >
-                  {event.title}
-                </div>
-            )
+              const {width,marginTop} = findOffset(index,event,true);
+              return renderEvent(event,index,width,marginTop);
           })
         }
         
         {noOfEvents>=0 ?
           <> 
             {sortedEvents.map((event, index) => {
-              //find difference in number of days between start and end date
               const {width,marginTop} = findOffset(index,event);
-              return (
-              <div
-                key={event.id}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  openEventSummary(event);
-                }}
-                style={{
-                  width,
-                  marginTop
-                }}
-                className={`z-10 line-clamp-1 my-[1px]  max-sm:h-[12px] h-[18px] flex justify-start 
-                  items-center cursor-pointer rounded-sm bg-[#039BE5] font-semibold p-[1px] text-[7px] 
-                  sm:text-xs text-white`}
-              >
-                {event.title} 
-              </div>
-            )})}
+              return renderEvent(event,index,width,marginTop);
+              })}
           </>
           :
           <>
             {sortedEvents.slice(0, emptyRows.length-1).map((event, index) => {
               //find difference in number of days between start and end date
               const {width,marginTop} = findOffset(index,event);
-              return (
-              <div
-                key={event.id}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  openEventSummary(event);
-                }}
-                style={{
-                  width,
-                  marginTop
-                }}
-                className={`z-10 line-clamp-1 my-[1px]  max-sm:h-[12px] h-[18px] flex justify-start 
-                  items-center cursor-pointer rounded-sm bg-[#039BE5] font-semibold p-[1px] text-[7px] 
-                  sm:text-xs text-white`}
-              >
-                {event.title}
-              </div>
-            )})}
+              return renderEvent(event,index,width,marginTop);
+              })}
             <div
               className="z-10 line-clamp-1 h-[18px] max-sm:h-[12px] w-full m-0 flex justify-start 
                 items-center cursor-pointer rounded-sm hover:bg-gray-300 text-[7px] font-semibold sm:text-xs p-[2px]
