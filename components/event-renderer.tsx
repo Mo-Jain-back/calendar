@@ -69,7 +69,6 @@ export function EventRenderer({ date, view, events, hour}: EventRendererProps) {
         newWrappedEvents.push({ id: event.id, startDate, endDate: endDate1 });
       }
     });
-    console.log("newWrappedEvents",newWrappedEvents);
         
     setWrappedEvents && setWrappedEvents(newWrappedEvents);
     const currentDate = date.startOf("day");
@@ -148,10 +147,6 @@ export function EventRenderer({ date, view, events, hour}: EventRendererProps) {
     const weekEnd = event.startDate.endOf("week");
     const weekendDuration = weekEnd.diff(event.startDate, "days")+1;
     const eventDuration = event.endDate.diff(event.startDate, "days")+1;
-    console.log("date",date.date());
-    console.log("eventId",event.id);
-    console.log("event -- ",event);
-    console.log("eventDuration",eventDuration);
     let temp = emptyRows[index];
     let cnt = 0;
     while(temp > 0){
@@ -192,7 +187,6 @@ export function EventRenderer({ date, view, events, hour}: EventRendererProps) {
               // return null;
               const event = events.find((event) => event.id === e.id);
               if(!event || !e.startDate.isSame(date,"day")) return null;
-              console.log('events',e)
               const {width,marginTop} = findOffset(index,e,true);
               return renderEvent(event,index,width,marginTop);
           })
