@@ -115,6 +115,35 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow,
     setEventsRow && setEventsRow(newEventsRow);    
   };
 
+  const findOffset  = (index:number,event:CalendarEventType) => {
+    const weekEnd = event.startDate.endOf("week");
+    const diffFromWeekEnd = weekEnd.diff(event.startDate, "days")+1;
+    const diffInDays = event.endDate.diff(event.startDate, "days")+1;
+    console.log("date",date.date());
+    console.log("emptyRows",emptyRows);
+    let temp = emptyRows[index];
+    let cnt = 0;
+    while(temp > 0){
+      if(index==0){
+        cnt = temp;
+        break;
+      }
+      temp--;
+      if(emptyRows[index-1] == temp) break;
+      cnt++;
+    }
+
+    if(index==0 && isWrapped){
+      cnt = 0;
+    }
+
+    const width = `calc((100% + 1px)*${Math.min(diffInDays,diffFromWeekEnd)})`;
+    const marginTop = `${isSmallScreen ? cnt * 13 : cnt * 19}px`;
+    return {width,marginTop};
+  }
+
+
+
   return (
     <div
       className={` w-full relative ${
@@ -139,7 +168,7 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow,
                     openEventSummary(event);
                   }}
                   style={{
-                    width: `calc(${100*(diffInDays-diffFromWeekEnd)}% + ${(diffInDays-diffFromWeekEnd)*2}px)`,
+                    width: `calc((100% + 1px)*${diffInDays-diffFromWeekEnd})`,
                   }}
                   className={`z-10 line-clamp-1 mb-[1px] max-sm:h-[12px] h-[18px]  flex justify-start 
                     items-center cursor-pointer rounded-sm bg-[#039BE5] font-semibold p-[1px] text-[7px] 
@@ -155,27 +184,7 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow,
           <> 
             {sortedEvents.map((event, index) => {
               //find difference in number of days between start and end date
-              const weekEnd = event.startDate.endOf("week");
-              const diffFromWeekEnd = weekEnd.diff(event.startDate, "days")+1;
-              const diffInDays = event.endDate.diff(event.startDate, "days")+1;
-              console.log("date",date.date());
-              console.log("emptyRows",emptyRows);
-              let temp = emptyRows[index];
-              let cnt = 0;
-              while(temp > 0){
-                if(index==0){
-                  cnt = temp;
-                  break;
-                }
-                temp--;
-                if(emptyRows[index-1] == temp) break;
-                cnt++;
-              }
-
-              if(index==0 && isWrapped){
-                cnt = 0;
-              }
-              
+              const {width,marginTop} = findOffset(index,event);
               return (
               <div
                 key={event.id}
@@ -184,8 +193,8 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow,
                   openEventSummary(event);
                 }}
                 style={{
-                  width: `calc(${100*Math.min(diffInDays,diffFromWeekEnd)}% + ${Math.min(diffInDays,diffFromWeekEnd)*1}px)`,
-                  marginTop: `${isSmallScreen ? cnt * 13 : cnt * 19}px`,
+                  width,
+                  marginTop
                 }}
                 className={`z-10 line-clamp-1 my-[1px]  max-sm:h-[12px] h-[18px] flex justify-start 
                   items-center cursor-pointer rounded-sm bg-[#039BE5] font-semibold p-[1px] text-[7px] 
@@ -199,24 +208,7 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow,
           <>
             {sortedEvents.slice(0, emptyRows.length-1).map((event, index) => {
               //find difference in number of days between start and end date
-              const weekEnd = event.startDate.endOf("week");
-              const diffFromWeekEnd = weekEnd.diff(event.startDate, "days")+1;
-              const diffInDays = event.endDate.diff(event.startDate, "days")+1;
-              let temp = emptyRows[index];
-              let cnt = 0;
-              while(temp > 0){
-                if(index==0){
-                  cnt = temp;
-                  break;
-                }
-                temp--;
-                if(emptyRows[index-1] == temp) break;
-                cnt++;
-              }
-
-              if(index==0 && isWrapped){
-                cnt = 0;
-              }
+              const {width,marginTop} = findOffset(index,event);
               return (
               <div
                 key={event.id}
@@ -225,8 +217,8 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow,
                   openEventSummary(event);
                 }}
                 style={{
-                  width: `calc(${100*Math.min(diffInDays,diffFromWeekEnd)}% + ${Math.min(diffInDays,diffFromWeekEnd)*1}px)`,
-                  marginTop: `${isSmallScreen ? cnt * 13 : cnt * 19}px`,
+                  width,
+                  marginTop
                 }}
                 className={`z-10 line-clamp-1 my-[1px]  max-sm:h-[12px] h-[18px] flex justify-start 
                   items-center cursor-pointer rounded-sm bg-[#039BE5] font-semibold p-[1px] text-[7px] 
