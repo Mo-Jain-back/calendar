@@ -1,5 +1,5 @@
 "use client";
-import { CalendarEventType, useEventRows, useEventStore } from "@/lib/store";
+import { CalendarEventType, useEventRows, useEventStore, useWrappedEvent, WrappedEvent } from "@/lib/store";
 import dayjs, { Dayjs } from "dayjs";
 import React, { use, useEffect, useState } from "react";
 import { useMediaQuery } from 'react-responsive';
@@ -9,18 +9,16 @@ interface EventRendererProps  {
   view: "month" | "week" | "day";
   events: CalendarEventType[];
   hour?: number;
-  eventsRow?: { id: string; rowIndex: number }[];
-  setEventsRow?: React.Dispatch<React.SetStateAction<{ id: string; rowIndex: number }[]>>;
-  wrappedEvents?: { id:string; date:Dayjs; endDate:Dayjs; rowIndex:number;}[];
-  setWrappedEvents?: React.Dispatch<React.SetStateAction<{ id:string; date:Dayjs; endDate:Dayjs; rowIndex:number;}[]>>;
 };
 
-export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow,wrappedEvents,setWrappedEvents}: EventRendererProps) {
+export function EventRenderer({ date, view, events, hour}: EventRendererProps) {
   const { openEventSummary } = useEventStore();
   const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
   const [emptyRows,setEmptyRows] = useState<number[]>([0,1,2,3,4]);
   const [isWrapped, setIsWrapped] = useState<boolean>(false);
   const [sortedEvents, setSortedEvents] = useState<CalendarEventType[]>([]);
+  const {eventsRow,setEventsRow} = useEventRows();
+  const {wrappedEvents,setWrappedEvents} = useWrappedEvent();
 
   useEffect(() => {
     Initialize();
@@ -50,14 +48,21 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow,
     const newWrappedEvents = wrappedEvents || [];
     newSortedEvents.forEach((event) => {
       const weekEnd = event.startDate.endOf("week");
-      const diffFromWeekEnd = weekEnd.diff(event.startDate, "days");
-      const diffInDays = event.endDate.diff(event.startDate, "days");
+      const weekendDuration = weekEnd.diff(event.startDate, "days");
+      const eventDuration = event.endDate.diff(event.startDate, "days");
       const newEventsRow = eventsRow || [];
-      const isPresent  = newEventsRow.find(e => e.id === event.id);
-      if(diffInDays>diffFromWeekEnd && !isPresent){
-        newWrappedEvents.push({ id: event.id, date: weekEnd.add(1, "day"), endDate:event.endDate, rowIndex: 0 });
-      }      
+      const isPresent = newEventsRow.find(e => e.id === event.id);
+    
+      const startDate = weekEnd.add(1, "day").startOf("day");
+      const endDate = startDate.endOf("week").isAfter(event.endDate, "day") 
+        ? event.endDate.startOf("day") 
+        : startDate.endOf("week").startOf("day");
+    
+      if (eventDuration > weekendDuration && !isPresent) {
+        newWrappedEvents.push({ id: event.id, startDate, endDate});
+      }
     });
+    console.log("newWrappedEvents",newWrappedEvents);
         
     setWrappedEvents && setWrappedEvents(newWrappedEvents);
     const currentDate = date.startOf("day");
@@ -77,8 +82,8 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow,
       if(!eventRow) return;
       const wrappedEvent = wrappedEvents?.find(e => e.id === eventRow?.id);
       if(wrappedEvent){
-        if((wrappedEvent.date.isBefore(date,"day") && wrappedEvent.endDate.isAfter(date,"day"))|| wrappedEvent.endDate.isSame(date,"day") || wrappedEvent.date.isSame(date,"day") ){
-          if(wrappedEvent.date.isSame(date,"day")){
+        if((wrappedEvent.startDate.isBefore(date,"day") && wrappedEvent.endDate.isAfter(date,"day"))|| wrappedEvent.endDate.isSame(date,"day") || wrappedEvent.startDate.isSame(date,"day") ){
+          if(wrappedEvent.startDate.isSame(date,"day")){
             setIsWrapped(true);
           }
           filledRows.push(index);
@@ -95,7 +100,6 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow,
 
     const rows=  [0,1,2,3,4]
     const newEmptyRows = rows.filter(row => !filledRows.includes(row));
-    console.log("newEmptyRows",newEmptyRows);
     setEmptyRows((prev)=>{
       return newEmptyRows;
     });
@@ -104,9 +108,6 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow,
     const newEventsRow = eventsRow || [];
     newSortedEvents.forEach((event) => {
       if (event.startDate.isSame(date, "day") && event.endDate.isAfter(date, "day")) {
-        console.log("date",date.date());
-        
-        console.log("newEmptyRows[index]....",newEmptyRows[index]);
         newEventsRow.push({ id: event.id, rowIndex: newEmptyRows[index] });
         index++;
       }
@@ -136,12 +137,14 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow,
     );
   }
 
-  const findOffset  = (index:number,event:CalendarEventType,isWrap:boolean=false) => {
+  const findOffset  = (index:number,event:CalendarEventType | WrappedEvent,isWrap:boolean=false) => {
     const weekEnd = event.startDate.endOf("week");
-    const diffFromWeekEnd = weekEnd.diff(event.startDate, "days")+1;
-    const diffInDays = event.endDate.diff(event.startDate, "days")+1;
+    const weekendDuration = weekEnd.diff(event.startDate, "days")+1;
+    const eventDuration = event.endDate.diff(event.startDate, "days")+1;
     console.log("date",date.date());
-    console.log("emptyRows",emptyRows);
+    console.log("eventId",event.id);
+    console.log("event -- ",event);
+    console.log("eventDuration",eventDuration);
     let temp = emptyRows[index];
     let cnt = 0;
     while(temp > 0){
@@ -158,10 +161,10 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow,
       cnt = 0;
     }
     
-    let width = `calc((100% + 1px)*${Math.min(diffInDays,diffFromWeekEnd)})`;
+    let width = `calc((100% + 2px) * ${Math.min(eventDuration, weekendDuration)} - 1px)`;;
     let marginTop = `${isSmallScreen ? cnt * 13 : cnt * 19}px`;
     if(isWrap){
-      width=`calc((100% + 1px)*${diffInDays-diffFromWeekEnd})`
+      width=`calc((100% + 2px)*${eventDuration} - 1px)`
       marginTop = "0"
     }
     return {width,marginTop};
@@ -181,8 +184,8 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow,
           wrappedEvents?.map((e,index) => {
               // return null;
               const event = events.find((event) => event.id === e.id);
-              if(!event || !e.date.isSame(date,"day")) return null;
-              const {width,marginTop} = findOffset(index,event,true);
+              if(!event || !e.startDate.isSame(date,"day")) return null;
+              const {width,marginTop} = findOffset(index,e,true);
               return renderEvent(event,index,width,marginTop);
           })
         }
@@ -210,7 +213,7 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow,
                 // Add logic to open a modal or show more events for the day
               }}
             >
-              {`${noOfEvents*(-1)} more`}
+              {`${noOfEvents*(-1)+1} more`}
             </div>
           </>
         }

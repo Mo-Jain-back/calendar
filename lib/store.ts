@@ -56,6 +56,24 @@ export const useEventRows = create<EventStore1>((set) => ({
   setEventsRow: (eventsRow) => set({ eventsRow }),
 }));
 
+export type WrappedEvent = {
+  id:string;
+  startDate:Dayjs;
+  endDate:Dayjs;
+}
+
+type WrappedEventStore = {
+  wrappedEvents: WrappedEvent[];
+  setWrappedEvents: (eventsRow: WrappedEvent[]) => void;
+};
+
+export const useWrappedEvent = create<WrappedEventStore>((set) => ({
+  wrappedEvents: [],
+  setWrappedEvents: (wrappedEvents) => set({ wrappedEvents }),
+}));
+
+
+
 export const useViewStore = create<ViewStoreType>()(
   devtools(
     persist(
