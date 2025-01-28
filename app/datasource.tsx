@@ -50,7 +50,7 @@ export const eventsData = [
         description: "forth Booking" ,
         startTime: "02:00",
         endTime:"20:00",
-        allDay:true
+        allDay:false
     },
     { 
         id: "6",
@@ -70,7 +70,7 @@ export const eventsData = [
         description: "fifth Booking" ,
         startTime: "03:00",
         endTime:"12:00",
-        allDay:true
+        allDay:false
     },
     { 
         id: "8",
@@ -80,7 +80,7 @@ export const eventsData = [
         description: "eighth Booking" ,
         startTime: "03:30",
         endTime:"16:00",
-        allDay:true
+        allDay:false
     },
     { 
         id: "9",

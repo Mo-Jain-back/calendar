@@ -233,7 +233,7 @@ export function EventRenderer({ date, view, events, hour}: EventRendererProps) {
             `${dayjs(event.startDate).format("YYYY-MM-DD")} ${event.endTime}`,
             "YYYY-MM-DD HH:mm"
           );
-
+          const noOfEvents = sortedEvents.length;
           const durationInMinutes = end.diff(start, "minute");
           const heightFactor = 16 / 60; // 16px for 1 hour
           const dynamicHeight = durationInMinutes * heightFactor * 4; // 1 hour = 64px
@@ -261,7 +261,7 @@ export function EventRenderer({ date, view, events, hour}: EventRendererProps) {
                 top: `${topOffset}px`,
               }}
               className={`absolute z-10 mx-[1px] line-clamp-1 max-sm:h-[12px] m-0 flex justify-start 
-                items-center cursor-pointer rounded-sm bg-[#039BE5] font-bold p-[2px] text-[7px] 
+                 cursor-pointer flex-wrap rounded-sm bg-[#039BE5] p-[2px] text-[7px] 
                 sm:text-sm text-white`}
             >
               {noOfEvents < 3 || view === "day" ? event.title : ""}
