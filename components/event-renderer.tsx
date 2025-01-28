@@ -33,7 +33,6 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow,
     const filteredEvents = events.filter((event: CalendarEventType) => {
       if (view === "month") {
         return event.startDate.format("DD-MM-YY") === date.format("DD-MM-YY")
-        // && event.startDate.format("DD-MM-YY") === event.endDate.format("DD-MM-YY");
       } else if (view === "week" || view === "day") {
         return event.startDate.hour() === hour && !event.allDay;
       }
@@ -54,7 +53,8 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow,
       const diffFromWeekEnd = weekEnd.diff(event.startDate, "days");
       const diffInDays = event.endDate.diff(event.startDate, "days");
       const newEventsRow = eventsRow || [];
-      if(diffInDays>diffFromWeekEnd){
+      const isPresent  = newEventsRow.find(e => e.id === event.id);
+      if(diffInDays>diffFromWeekEnd && !isPresent){
         newWrappedEvents.push({ id: event.id, date: weekEnd.add(1, "day"), endDate:event.endDate, rowIndex: 0 });
       }      
     });
@@ -114,8 +114,6 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow,
 
     setEventsRow && setEventsRow(newEventsRow);    
   };
-
-  
 
   return (
     <div
@@ -246,7 +244,7 @@ export function EventRenderer({ date, view, events, hour,eventsRow,setEventsRow,
                 // Add logic to open a modal or show more events for the day
               }}
             >
-              {`${noOfEvents+1} more`}
+              {`${noOfEvents*(-1)} more`}
             </div>
           </>
         }
