@@ -16,6 +16,7 @@ const HeaderEvent = ({index,date,today}:{index:number,date:Dayjs,today:boolean})
     const {wrappedEvents} = useWrappedEvent();
     const [noOfEvents,setNoOfEvents] = useState(0);
     const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' });
+    const isSizeExtraSmall = useMediaQuery({ query: '(max-width: 400px)' });
 
     useEffect(() => {
       Initialize();
@@ -93,18 +94,20 @@ const HeaderEvent = ({index,date,today}:{index:number,date:Dayjs,today:boolean})
       if(index==0 && isWrapped){
         cnt = 0;
       }
+
+      const singleEventWidth =  "100%";
       
-      let width = `calc((100%) * ${Math.min(eventDuration, weekendDuration)} - 1px)`;;
+      let width = `calc(${singleEventWidth} * ${Math.min(eventDuration, weekendDuration)} - 1px)`;
       let marginTop = `${isSmallScreen ? cnt * 13 : cnt * 18}px`;
       if(isWrap){
-        width=`calc((100%)*${eventDuration} - 1px)`
+        width=`calc(${singleEventWidth}*${eventDuration} - 1px)`
         marginTop = "0"
       }
       // width = "100%"
       return {width,marginTop};
     }
 
-    const renderEvent = (event:CalendarEventType,index:number,width:string,marginTop:string|number) => {
+    const renderEvent = (event: CalendarEventType, index: number, width: string, marginTop: string | number) => {
       return (
         <div
           key={event.id}
@@ -114,61 +117,59 @@ const HeaderEvent = ({index,date,today}:{index:number,date:Dayjs,today:boolean})
           }}
           style={{
             width,
-            marginTop
+            marginTop,
+            minWidth:"30px"
           }}
-          className={` my-[1px] max-sm:h-[12px] w-full flex justify-center items-center cursor-pointer rounded-sm bg-blue-700 text-[7px] 
-            sm:text-xs text-white`}
+          className={cn(
+            "my-[1px] max-sm:h-[12px] w-full flex items-center justify-center cursor-pointer rounded-sm bg-blue-700 text-[7px] sm:text-xs text-white overflow-hidden whitespace-nowrap",
+            isSmallScreen ? "text-[9px]" : "px-2 text-[12px]"
+          )}
         >
-          {event.title}
+          <span className="truncate">{event.title}</span>
         </div>
       );
-    }
+    };
   
-    return(
-    <div key={index} className="flex flex-col items-center justify-start w-full">
-      <div className={cn("text-xs mt-6 sm:mt-8", today && "text-blue-600")}>
-        {currentDate.format("ddd")}
-      </div>
-      <div
-        className={cn(
-          "h-8 w-8 sm:h-10 sm:w-10 text-center flex items-center rounded-full p-2 text-sm sm:text-lg",
-          today && "bg-blue-600 text-white",
-        )}
-      >
-        {currentDate.format("DD")}{" "}
-      </div>
-      <div className="flex flex-col w-full transition-all duration-500 ease-in-out" style={{maxHeight: isEventHidden ? "40px sm:60px" : ""}}>
-        {
-            wrappedEvents?.map((e,index) => {
-                // return null;
-                const event = events.find((event) => event.id === e.id);
-                if(!event || !e.startDate.isSame(date,"day")) return null;
-                const {width,marginTop} = findOffset(index,e,true);
-                return renderEvent(event,index,width,marginTop);
+    return (
+      <div key={index} className="flex flex-col min-w-[30px] items-center justify-start w-full">
+        <div className={cn("text-xs mt-6 sm:mt-8", today && "text-blue-600")}>
+          {currentDate.format("ddd")}
+        </div>
+        <div
+          className={cn(
+            "h-8 w-8 sm:h-10 sm:w-10 text-center flex items-center rounded-full p-2 text-sm sm:text-lg",
+            today && "bg-blue-600 text-white min-w-[30px]"
+          )}
+        >
+          {currentDate.format("DD")}{" "}
+        </div>
+        <div
+          className="flex flex-col w-full transition-all duration-500 ease-in-out"
+          style={{ maxHeight: isEventHidden ? "40px sm:60px" : "" }}
+        >
+          {wrappedEvents?.map((e, index) => {
+            const event = events.find((event) => event.id === e.id);
+            if (!event || !e.startDate.isSame(date, "day")) return null;
+            const { width, marginTop } = findOffset(index, e, true);
+            return renderEvent(event, index, width, marginTop);
+          })}
+          {noOfEvents < 4 || !isEventHidden ? (
+            sortedEvents.map((event, index) => {
+              const { width, marginTop } = findOffset(index, event);
+              return renderEvent(event, index, width, marginTop);
             })
-          }
-        {noOfEvents < 4 || !isEventHidden ? 
-        <>
-        {
-          sortedEvents.map((event, index) => {
-            const {width,marginTop} = findOffset(index,event);
-            return renderEvent(event,index,width,marginTop);
-          })
-        }
-        </>
-        :
-        <>
-          {
-            sortedEvents.slice(0, 2).map((event, index) => {
-              const {width,marginTop} = findOffset(index,event);
-              return renderEvent(event,index,width,marginTop);
-            })
-          }
-          <div className="text-xs sm:text-sm px-2">+{noOfEvents-2}</div>
-        </>
-      }
+          ) : (
+            <>
+              {sortedEvents.slice(0, 2).map((event, index) => {
+                const { width, marginTop } = findOffset(index, event);
+                return renderEvent(event, index, width, marginTop);
+              })}
+              <div className="text-xs sm:text-sm px-2">+{noOfEvents - 2}</div>
+            </>
+          )}
+        </div>
       </div>
-    </div>
-)};
-
-export default HeaderEvent;
+    );
+  };
+  
+  export default HeaderEvent;

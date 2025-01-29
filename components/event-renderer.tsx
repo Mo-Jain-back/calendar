@@ -241,7 +241,7 @@ export function EventRenderer({ date, view, events, hour}: EventRendererProps) {
 
           // Calculate total available width and width per event
           const totalGap = (noOfEvents - 1) * 1; // Total gap space
-          const availableWidth = 100 - totalGap; // Remaining width for events
+          const availableWidth = 90 - totalGap; // Remaining width for events
           const eventWidth = `${availableWidth / noOfEvents}%`;
           const leftOffset = `calc(${index} * (${availableWidth / noOfEvents}% + 1px))`; // Adjust position for gaps
 
