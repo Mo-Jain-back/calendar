@@ -5,20 +5,20 @@ import { useState } from "react"
 import { X, Edit2, Trash2, Users, Car } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
-import type { CalendarEventType } from "@/lib/store"
+import { useEventStore, type CalendarEventType } from "@/lib/store"
 
 interface EventSummaryPopupProps {
   event: CalendarEventType
   isOpen: boolean
   onClose: () => void
-  setEvents: React.Dispatch<React.SetStateAction<CalendarEventType[]>>
 }
 
-export function EventSummaryPopup({ event, isOpen, onClose, setEvents }: EventSummaryPopupProps) {
-  const [isEditing, setIsEditing] = useState(false)
+export function EventSummaryPopup({ event, isOpen, onClose }: EventSummaryPopupProps) {
+  const [isEditing, setIsEditing] = useState(false);
+  const {setEvents} = useEventStore();
 
   const handleDelete = () => {
-    setEvents((prevEvents) => prevEvents.filter((e) => e.id !== event.id))
+    setEvents((prevEvents:CalendarEventType[]) => prevEvents.filter((e) => e.id !== event.id))
     onClose()
   }
 

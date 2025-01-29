@@ -10,7 +10,7 @@ import SideBar from "./sidebar/SideBar";
 import WeekView from "./week-view";
 import DayView from "./day-view";
 import EventPopover from "./event-popover";
-import { EventSummaryPopover } from "./event-summary-popover";
+import { EventSummaryPopup } from "./event-summary-popover";
 import { useEffect } from "react";
 import dayjs from "dayjs";
 import { useMediaQuery } from "react-responsive";
@@ -69,7 +69,7 @@ export default function MainView({
       )}
 
       {isEventSummaryOpen && selectedEvent && (
-        <EventSummaryPopover
+        <EventSummaryPopup
           isOpen={isEventSummaryOpen}
           onClose={closeEventSummary}
           event={selectedEvent}
