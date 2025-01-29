@@ -36,6 +36,17 @@ export default function HeaderRight(
         <SelectItem value="day">Day</SelectItem>
       </SelectContent>
     </Select>
+    <Select>
+      <SelectTrigger style={{marginLeft:"2px"}} className="sm:w-24 select-none w-18 p-1 sm:p-2 m-0 text-xs sm:text-sm active:outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ring focus-visible:ring-offset-0">
+        <SelectValue placeholder="Cars" />
+      </SelectTrigger>
+      <SelectContent>
+      <SelectItem value="all">All</SelectItem>
+        <SelectItem value="tesla">Tesla</SelectItem>
+        <SelectItem value="maruti">Maruti</SelectItem>
+        <SelectItem value="audi">Audi</SelectItem>
+      </SelectContent>
+    </Select>
   </div>
   )
 }

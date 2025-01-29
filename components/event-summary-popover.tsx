@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { useEventStore, type CalendarEventType } from "@/lib/store"
 import { Input } from "@/components/ui/input"
+import dayjs from "dayjs"
+import { desc } from "drizzle-orm"
 
 interface EventSummaryPopupProps {
   event: CalendarEventType
@@ -17,13 +19,13 @@ interface EventSummaryPopupProps {
 export function EventSummaryPopup({ event, isOpen, onClose }: EventSummaryPopupProps) {
   const {events,setEvents} = useEventStore();
   const [isEditing, setIsEditing] = useState(false)
-  const [editedEvent, setEditedEvent] = useState(event);
   const [startDate,setStartDate] = useState(event.startDate);
   const [endDate,setEndDate] = useState(event.endDate);
   const [startTime,setStartTime] = useState(event.startTime);
   const [endTime,setEndTime] = useState(event.endTime);
   const [bookedBy,setBookedBy] = useState("John Doe");
   const [color,setColor] = useState("#039BE5");
+  const [car,setCar] = useState("Tesla Model 3");
 
   const handleDelete = () => {
     const updatedEvents = events.filter((e) => e.id !== event.id)
@@ -36,19 +38,26 @@ export function EventSummaryPopup({ event, isOpen, onClose }: EventSummaryPopupP
   }
 
   const handleUpdate = () => {
+    const editedEvent = {
+      id: event.id,
+      title: event.title,
+      description: event.description,
+      startDate: startDate,
+      endDate: endDate,
+      startTime: startTime,
+      endTime: endTime,
+      allDay: event.allDay,
+    }
     const updatedEvents = events.map((e) => (e.id === event.id ? editedEvent : e))
     setEvents(updatedEvents)
     setIsEditing(false)
   }
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setEditedEvent((prev) => ({ ...prev, [name]: value }))
-  }
+
   return (
     <Dialog open={isOpen}  onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] max-sm:h-[90%] flex flex-col ">
-        <div className="flex justify-between items-center mb-4">
+      <DialogContent className="sm:max-w-[425px] max-sm:h-[70%] flex flex-col items-center ">
+        <div className="flex justify-between items-center mb-4 w-full">
           <div className="flex space-x-2">
             <Button variant="ghost" size="icon" onClick={handleEdit}>
               <Edit2 className="h-4 w-4" />
@@ -60,8 +69,8 @@ export function EventSummaryPopup({ event, isOpen, onClose }: EventSummaryPopupP
           
         </div>
 
-        <div className="flex items-start space-x-4">
-          <div className="w-6 h-6 rounded-md" style={{ backgroundColor: color }} />
+        <div className="flex items-start space-x-4 w-[90%]">
+          <div className="w-6 h-6 rounded-md mt-2" style={{ backgroundColor: color }} />
           <div className="flex-1">
             <h2 className="text-lg font-semibold mb-2">You have a booking from</h2>
             {isEditing ? (
@@ -70,7 +79,7 @@ export function EventSummaryPopup({ event, isOpen, onClose }: EventSummaryPopupP
                   type="date"
                   name="startDate"
                   value={startDate.format("YYYY-MM-DD")}
-                  onChange={handleInputChange}
+                  onChange={(e) => setStartDate(dayjs(e.target.value))}
                   className="bg-gray-100"
                 />
                 {!event.allDay && (
@@ -78,7 +87,7 @@ export function EventSummaryPopup({ event, isOpen, onClose }: EventSummaryPopupP
                     type="time"
                     name="startTime"
                     value={startTime}
-                    onChange={handleInputChange}
+                    onChange={(e) => setStartTime(e.target.value)}
                     className="bg-gray-100"
                   />
                 )}
@@ -86,7 +95,7 @@ export function EventSummaryPopup({ event, isOpen, onClose }: EventSummaryPopupP
                   type="date"
                   name="endDate"
                   value={endDate.format("YYYY-MM-DD")}
-                  onChange={handleInputChange}
+                  onChange={(e) => setEndDate(dayjs(e.target.value))}
                   className="bg-gray-100"
                 />
                 {!event.allDay && (
@@ -94,7 +103,7 @@ export function EventSummaryPopup({ event, isOpen, onClose }: EventSummaryPopupP
                     type="time"
                     name="endTime"
                     value={endTime}
-                    onChange={handleInputChange}
+                    onChange={(e) => setEndTime(e.target.value)}
                     className="bg-gray-100"
                   />
                 )}
@@ -109,16 +118,17 @@ export function EventSummaryPopup({ event, isOpen, onClose }: EventSummaryPopupP
           </div>
         </div>
 
-        <div className="mt-4 space-y-4">
+        <div className="mt-4 space-y-4 w-[90%]">
           <div className="flex items-start space-x-2">
-            <Users className="h-5 w-5 mt-1" />
+            
+            <Users className="h-5 w-5 mt-1 mr-3" />
             <div>
               <p className="text-sm font-medium">Booked by</p>
               {isEditing ? (
                 <Input
                   name="bookedBy"
                   value={bookedBy}
-                  onChange={handleInputChange}
+                  onChange={(e) => setBookedBy(e.target.value)}
                   className="bg-gray-100"
                 />
               ) : (
@@ -127,10 +137,10 @@ export function EventSummaryPopup({ event, isOpen, onClose }: EventSummaryPopupP
             </div>
           </div>
           <div className="flex items-start space-x-2">
-            <Car className="h-5 w-5 mt-1" />
+            <Car className="h-5 w-5 mt-1 mr-3" />
             <div>
               <p className="text-sm font-medium">Car</p>
-              <p className="text-sm">{event.car || "Tesla Model 3"}</p>
+              <p className="text-sm">{car}</p>
             </div>
           </div>
         </div>

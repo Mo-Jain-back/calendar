@@ -66,7 +66,6 @@ const HeaderEvent = ({index,date,today,isEventHidden}:{index:number,date:Dayjs,t
             filledRows.push(eventRow.rowIndex);
           }
       });
-      console.log("filledRows",filledRows);
 
       setNoOfEvents(filledRows.length);
   
@@ -90,9 +89,7 @@ const HeaderEvent = ({index,date,today,isEventHidden}:{index:number,date:Dayjs,t
         if(emptyRows[index-1] == temp) break;
         cnt++;
       }
-      console.log("date",date.date());
       
-      console.log("noOfEvents",noOfEvents);
   
       if(index==0 && isWrapped){
         cnt = 0;
@@ -167,16 +164,12 @@ const HeaderEvent = ({index,date,today,isEventHidden}:{index:number,date:Dayjs,t
           ) : (
             <>
               {wrappedEvents?.slice(0, 2).map((e, index) => {
-                console.log("date",date.date());
-                console.log("wrappedEventsLength",wrappedEvents.length)
               const event = events.find((event) => event.id === e.id);
               if (!event || !e.startDate.isSame(date, "day")) return null;
                 const { width, marginTop } = findOffset(index, e, true);
                 return renderEvent(event, index, width, marginTop);
               })}
               {sortedEvents.slice(0, 2-noOfEvents | 0).map((event, index) => {
-                console.log("date",date.date());
-                console.log("sortedEvents",sortedEvents.length)
                 const { width, marginTop } = findOffset(index, event);
                 return renderEvent(event, index, width, marginTop);
               })}

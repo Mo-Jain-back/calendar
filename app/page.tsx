@@ -24,7 +24,7 @@ export default async function Home() {
   const dbEvents = eventsData;
 
   return (
-    <div className="">
+    <div className="scrollbar-hide">
       <Header />
       <MainView eventsData={dbEvents as unknown as CalendarEventType[]} />
     </div>

@@ -136,7 +136,7 @@ export function EventRenderer({ date, view, events, hour}: EventRendererProps) {
         }}
         className={`z-10 line-clamp-1 my-[1px]  max-sm:h-[12px] h-[18px] flex justify-start 
           items-center cursor-pointer rounded-sm bg-[#039BE5] font-semibold p-[1px] text-[7px] 
-          sm:text-xs text-white`}
+          sm:text-xs text-white whitespace-nowrap overflow-ellipsis`}
       >
         {event.title}
       </div>

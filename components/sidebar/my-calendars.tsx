@@ -20,7 +20,7 @@ export default function MyCalendars() {
     <Accordion type="single" collapsible>
       <AccordionItem value="item-1">
         <AccordionTrigger className="justify-normal gap-32 text-sm hover:no-underline">
-          My Calendars
+          My Cars
         </AccordionTrigger>
         <AccordionContent className="grid gap-2">
           {myCalendars.map((cal) => (

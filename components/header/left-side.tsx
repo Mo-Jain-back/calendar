@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {  Menu } from "lucide-react";
 import { BsCaretDownFill } from "react-icons/bs";
 import { Button } from "../ui/button";
@@ -22,6 +22,10 @@ export default function HeaderLeft(
   const { setSideBarOpen } = useToggleSideBarStore();
 
   const { selectedView } = useViewStore();
+
+  useEffect(()=>{
+    setSideBarOpen();
+  },[])
 
   const handleTodayClick = () => {
     switch (selectedView) {
@@ -113,12 +117,12 @@ export default function HeaderLeft(
       </div>
 
       {/* Today Button */}
-      <Button variant="outline" className="text-xs select-none sm:text-sm px-2 py-1" onClick={handleTodayClick}>
+      <Button variant="outline" className="text-xs select-none sm:text-sm px-4 rounded-lg py-1" onClick={handleTodayClick}>
         Today
       </Button>
 
       {/* Navigation Controls */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center ">
         <MdKeyboardArrowLeft
           className="size-6 cursor-pointer font-bold"
           onClick={handlePrevClick}

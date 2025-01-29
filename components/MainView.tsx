@@ -50,7 +50,7 @@ export default function MainView({
   }, [eventsData, setEvents]);
 
   return (
-    <div className="flex ">
+    <div className="flex scrollbar-hide">
       {/* SideBar */}
     
       <SideBar />

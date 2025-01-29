@@ -42,7 +42,7 @@ export default function MonthViewBox({
     >
       <div className=" flex flex-col min-h-6 items-center">
         {rowIndex === 0 && (
-          <h4 className="text-[10px] sm:text-xs text-gray-500">
+          <h4 className="text-[10px] font-medium sm:text-xs text-gray-500">
             {day.format("ddd").toUpperCase()}
           </h4>
         )}
