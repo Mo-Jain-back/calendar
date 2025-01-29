@@ -23,17 +23,9 @@ const HeaderEvent = ({index,date,today,isEventHidden}:{index:number,date:Dayjs,t
         
     const Initialize = () => {
       const filteredEvents = events.filter((event: CalendarEventType) => {
-        return event.startDate.format("DD-MM-YY") === date.format("DD-MM-YY")
+        return event.startDate.isSame(date,"days") && event.endDate.isAfter(date,"days");
       });
-      
-      const newSortedEvents = [...filteredEvents].sort((a, b) => {
-        const durationA = a.endDate.diff(a.startDate, "minute"); // Get duration in minutes
-        const durationB = b.endDate.diff(b.startDate, "minute");
-        return durationB - durationA; // Sort in descending order (longest first)
-      });
-  
-      setSortedEvents(newSortedEvents);
-
+          
       
       const currentDate = date.startOf("day");
       const extendedEvents = events.filter((event) => {
@@ -42,7 +34,15 @@ const HeaderEvent = ({index,date,today,isEventHidden}:{index:number,date:Dayjs,t
         return (eventStart.isBefore(currentDate) && eventEnd.isSame(currentDate))
         || (eventStart.isBefore(currentDate) && eventEnd.isAfter(currentDate));
       });
-  
+
+      const newSortedEvents = [...filteredEvents].sort((a, b) => {
+        const durationA = a.endDate.diff(a.startDate, "minute"); // Get duration in minutes
+        const durationB = b.endDate.diff(b.startDate, "minute");
+        return durationB - durationA; // Sort in descending order (longest first)
+      });
+
+      setSortedEvents(newSortedEvents);
+      
       let filledRows:number[] = [];
       let index=0;
       extendedEvents.forEach((event) => {

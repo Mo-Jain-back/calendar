@@ -14,6 +14,7 @@ export default function DayView() {
   const { userSelectedDate, setDate } = useDateStore();
   const { openEventSummary } = useEventStore();
   const [filteredEvents,setFilteredEvents] = useState<CalendarEventType[]>([]);
+  const [headerEvents,setHeaderEvents] = useState<CalendarEventType[]>([]);
   const [noOfEvents, setNoOfEvents] = useState<number>(0);
   const [isEventHidden, setIsEventHidden] = useState(true);
 
@@ -25,24 +26,33 @@ export default function DayView() {
   }, []);
 
   useEffect(() => {
+    getFormatedEvents(events,userSelectedDate);
+  }, [events,userSelectedDate]);
+
+  useEffect(() => {
     getAllDayEvents(events,userSelectedDate);
-  }, [userSelectedDate]);
+  }, [events,isEventHidden,userSelectedDate]);
 
 
   const getFormatedEvents = (events:CalendarEventType[], date:Dayjs) => {
-    const filteredEvents = events.filter((event: CalendarEventType) => {
+    const selectedEvents = events.filter((event: CalendarEventType) => {
         return event.startDate.format("DD-MM-YY") === date.format("DD-MM-YY");
       });
 
-    return filteredEvents;
+    setFilteredEvents(selectedEvents);
   }
 
   const getAllDayEvents = (events:CalendarEventType[], date:Dayjs) => {
-      const tempEvents = events.filter((event: CalendarEventType) => {
-          return event.startDate.format("DD-MM-YY") === date.format("DD-MM-YY") && event.allDay;
+      let tempEvents = events.filter((event: CalendarEventType) => {
+          return (event.startDate.isBefore(date,"days") && event.endDate.isAfter(date,"days"))
+          || (event.startDate.isSame(date,"days") && event.endDate.isAfter(date,"days"))
+          || (event.startDate.isBefore(date,"days") && event.endDate.isSame(date,"days"))
+          || (event.allDay);
         });
+
+      tempEvents = (noOfEvents < 5 || !isEventHidden) ? tempEvents : tempEvents.slice(0,3)
       setNoOfEvents(tempEvents.length);
-      setFilteredEvents(tempEvents);
+      setHeaderEvents(tempEvents);
     }
   
 
@@ -72,45 +82,25 @@ export default function DayView() {
           
         </div>
         <div className="flex flex-col w-full">
-            {noOfEvents < 5 || !isEventHidden ? 
-              <>
-              {
-                filteredEvents.length > 0 && filteredEvents.map((event) => (
-                  <div
-                    key={event.id}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openEventSummary(event);
-                    }}
-                    className={` my-[1px] max-sm:h-[12px] w-full flex justify-center items-center cursor-pointer rounded-sm bg-blue-700 text-[7px] 
-                        sm:text-xs text-white`}
-                        >
-                    {event.title}
-                  </div>
-                ))
-              }
-              </>
-              :
-              <>
-                {
-                  filteredEvents.slice(0, 3).map((event, index) => (
-                    <div
-                      key={event.id}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openEventSummary(event);
-                      }}
-                      className={` my-[1px] max-sm:h-[12px] w-full flex justify-center items-center cursor-pointer rounded-sm bg-blue-700 text-[7px] 
-                          sm:text-xs text-white`}
-                          >
-                      {event.title}
-                    </div>
-                  ))
-                }
-                <div className="text-xs sm:text-sm px-2">+{noOfEvents-3}</div>
-              </>
-            }
-            </div>
+            {
+               headerEvents.map((event) => {
+                const eventDuration = event.endDate.diff(event.startDate,"days") + 1;
+                const currentDuration  = userSelectedDate.diff(event.startDate,"days") + 1;
+                return(
+                <div
+                  key={event.id}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openEventSummary(event);
+                  }}
+                  className={` my-[1px] max-sm:h-[12px] w-full flex justify-center items-center cursor-pointer rounded-sm bg-[#039BE5] text-[7px] 
+                      sm:text-xs text-white`}
+                      >
+                  {event.title}  {"("} {currentDuration} / {eventDuration} {")"}
+                </div>
+              )})
+            }          
+          </div>
       </div>
 
       <ScrollArea className="h-[70vh]">
@@ -138,7 +128,7 @@ export default function DayView() {
                 }}
               >
                 <EventRenderer
-                  events={getFormatedEvents(events,userSelectedDate)}
+                  events={filteredEvents}
                   date={userSelectedDate.hour(hour.hour())}
                   view="day"
                   hour={hour.hour()}
