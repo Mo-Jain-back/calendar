@@ -8,8 +8,26 @@ import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { useEventStore, type CalendarEventType } from "@/lib/store"
 import { Input } from "@/components/ui/input"
 import dayjs from "dayjs"
-import { desc } from "drizzle-orm"
+import { Clock, CheckCircle, XCircle, Loader2 } from "lucide-react";
 
+enum Status {
+  pending = "pending",
+  confirmed = "confirmed",
+  cancelled = "cancelled",
+  inProgress = "inProgress",
+  completed = "completed",
+}
+export const BookingStatusIcon  = ({ status,className }: { status?: Status; className?: string }) => {
+  const statusIcons = {
+    pending: <Clock className={`text-yellow-500 ${className}`} />,
+    confirmed: <CheckCircle className={`text-green-500 ${className}`} />,
+    cancelled: <XCircle className={`text-red-500 ${className}`} />,
+    inProgress: <Loader2 className={`text-blue-500 animate-spin ${className}`} />,
+    completed: <CheckCircle className={`text-green-500 ${className}`} />,
+  };
+
+  return status ? statusIcons[status] : <Clock className={`text-gray-500 ${className}`} />;
+};
 interface EventSummaryPopupProps {
   event: CalendarEventType
   isOpen: boolean
@@ -56,7 +74,7 @@ export function EventSummaryPopup({ event, isOpen, onClose }: EventSummaryPopupP
 
   return (
     <Dialog open={isOpen}  onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] max-sm:h-[70%] flex flex-col items-center ">
+      <DialogContent className="sm:max-w-[425px] max-sm:min-h-[70%] flex flex-col items-center ">
         <div className="flex justify-between items-center mb-4 w-full">
           <div className="flex space-x-2">
             <Button variant="ghost" size="icon" onClick={handleEdit}>
@@ -72,7 +90,7 @@ export function EventSummaryPopup({ event, isOpen, onClose }: EventSummaryPopupP
         <div className="flex items-start space-x-4 w-[90%]">
           <div className="w-6 h-6 rounded-md mt-2" style={{ backgroundColor: color }} />
           <div className="flex-1">
-            <h2 className="text-lg font-semibold mb-2">You have a booking from</h2>
+            <h2 className="text-lg font-semibold mb-2">Your booking starts from</h2>
             {isEditing ? (
               <div className="space-y-2">
                 <Input
@@ -141,6 +159,12 @@ export function EventSummaryPopup({ event, isOpen, onClose }: EventSummaryPopupP
             <div>
               <p className="text-sm font-medium">Car</p>
               <p className="text-sm">{car}</p>
+            </div>
+          </div>
+          <div className="flex items-start space-x-2">
+            <BookingStatusIcon status={Status.pending} className="h-5 w-5 mt-1 mr-3" />
+            <div>
+              <p className="text-sm font-medium">Booking yet to Start</p>
             </div>
           </div>
         </div>
