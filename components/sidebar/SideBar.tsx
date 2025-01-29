@@ -1,6 +1,5 @@
 import { cn } from "@/lib/utils";
 import React from "react";
-import Create from "./create";
 import SideBarCalendar from "./side-bar-calendar";
 import SearchUsers from "./search-users";
 import MyCalendars from "./my-calendars";
@@ -19,7 +18,6 @@ export default function SideBar() {
         )}
         style={{ overflow: 'hidden' }}
       >
-      <Create />
       <SideBarCalendar />
       <SearchUsers />
       <MyCalendars />

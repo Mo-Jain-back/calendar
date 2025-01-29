@@ -1,64 +1,83 @@
-'use client'
+"use client"
 
-import React, { useRef, useEffect } from 'react'
-import dayjs from 'dayjs'
+import type React from "react"
+import { useState } from "react"
+import { X, Edit2, Trash2, Users, Car } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { IoCloseSharp } from "react-icons/io5"
-import { CalendarEventType } from '@/lib/store'
+import { Dialog, DialogContent } from "@/components/ui/dialog"
+import type { CalendarEventType } from "@/lib/store"
 
-interface EventSummaryPopoverProps {
+interface EventSummaryPopupProps {
+  event: CalendarEventType
   isOpen: boolean
   onClose: () => void
-  event: CalendarEventType
+  setEvents: React.Dispatch<React.SetStateAction<CalendarEventType[]>>
 }
 
-export function EventSummaryPopover({ isOpen, onClose, event }: EventSummaryPopoverProps) {
+export function EventSummaryPopup({ event, isOpen, onClose, setEvents }: EventSummaryPopupProps) {
+  const [isEditing, setIsEditing] = useState(false)
 
-    
-    
-  const popoverRef = useRef<HTMLDivElement>(null)
+  const handleDelete = () => {
+    setEvents((prevEvents) => prevEvents.filter((e) => e.id !== event.id))
+    onClose()
+  }
 
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (popoverRef.current && !popoverRef.current.contains(e.target as Node)) {
-        onClose()
-      }
+  const handleEdit = () => {
+    setIsEditing(!isEditing)
+    // Implement edit functionality here
+  }
+
+  const formatDateRange = () => {
+    const { startDate, endDate, startTime, endTime, allDay } = event
+    if (allDay) {
+      return `${startDate.format("MMM D, YYYY")} - ${endDate.format("MMM D, YYYY")}`
     }
-
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [isOpen, onClose])
-
-  if (!isOpen) return null
+    return `${startDate.format("MMM D, YYYY")} ${startTime} - ${endDate.format("MMM D, YYYY")} ${endTime}`
+  }
 
   return (
-    <div
-      className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50"
-      onClick={onClose}
-    >
-      <div
-        ref={popoverRef}
-        className="w-full max-w-md rounded-lg bg-white p-6 shadow-lg"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Event Summary</h2>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[425px]">
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex space-x-2">
+            <Button variant="ghost" size="icon" onClick={handleEdit}>
+              <Edit2 className="h-4 w-4" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={handleDelete}>
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
           <Button variant="ghost" size="icon" onClick={onClose}>
-            <IoCloseSharp className="h-4 w-4" />
+            <X className="h-4 w-4" />
           </Button>
         </div>
-        <div className="space-y-2">
-          <p><strong>Title:</strong> {event.title}</p>
-          {/* Format the date before displaying it */}
-          <p><strong>Date:</strong> {dayjs(event.startDate).format("dddd, MMMM D, YYYY h:mm A")}</p>
-          {/* Add more event details here */}
+
+        <div className="flex items-start space-x-4">
+          <div className="w-6 h-6 rounded-md" style={{ backgroundColor: event.color || "#039BE5" }} />
+          <div className="flex-1">
+            <h2 className="text-lg font-semibold">You have a booking from</h2>
+            <p className={`text-sm ${isEditing ? "border rounded p-1" : ""}`}>{formatDateRange()}</p>
+          </div>
         </div>
-      </div>
-    </div>
+
+        <div className="mt-4 space-y-2">
+          <div className="flex items-center space-x-2">
+            <Users className="h-5 w-5" />
+            <div>
+              <p className="text-sm font-medium">Booked by</p>
+              <p className={`text-sm ${isEditing ? "border rounded p-1" : ""}`}>{event.bookedBy || "John Doe"}</p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Car className="h-5 w-5" />
+            <div>
+              <p className="text-sm font-medium">Car</p>
+              <p className="text-sm">{event.car || "Tesla Model 3"}</p>
+            </div>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   )
 }
+
