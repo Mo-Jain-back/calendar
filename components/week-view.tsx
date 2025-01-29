@@ -38,7 +38,7 @@ export default function WeekView() {
 
   return (
     <>
-      <div className="grid grid-cols-[auto_1fr_1fr_1fr_1fr_1fr_1fr_1fr] bg-gray-300 px-4  py-2">
+      <div className="grid grid-cols-[auto_1fr_1fr_1fr_1fr_1fr_1fr_1fr] border-b border-gray-300 px-4  py-2">
         <div className="w-16 border-r border-gray-400 flex flex-col items-center justify-between">
           <div className="relative h-[64px]">
             <div className="absolute top-2 text-xs text-gray-600">GMT +2</div>
