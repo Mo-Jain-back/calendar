@@ -11,7 +11,7 @@ export default function SideBar() {
   return (
       <aside
         className={cn(
-          "border-t py-3 transition-all max-lg:w-0 duration-100 ease-in-out",
+          "border-t py-3 transition-all max-lg:w-0 duration-300 ease-in-out",
           {
             "lg:w-60 lg:opacity-100": isSideBarOpen,
             "w-0 opacity-0 ": !isSideBarOpen,
