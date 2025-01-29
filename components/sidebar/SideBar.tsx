@@ -9,16 +9,20 @@ import { useToggleSideBarStore } from "@/lib/store";
 export default function SideBar() {
   const { isSideBarOpen } = useToggleSideBarStore();
   return (
-    <aside
-      className={cn(
-        "w-92 hidden border-t px-2 py-3 transition-all duration-300 ease-in-out lg:block",
-        !isSideBarOpen && "lg:hidden",
-      )}
-    >
+      <aside
+        className={cn(
+          "border-t py-3 transition-all max-lg:w-0 duration-100 ease-in-out",
+          {
+            "lg:w-60 lg:opacity-100": isSideBarOpen,
+            "w-0 opacity-0 ": !isSideBarOpen,
+          }
+        )}
+        style={{ overflow: 'hidden' }}
+      >
       <Create />
       <SideBarCalendar />
       <SearchUsers />
       <MyCalendars />
-    </aside>
+    </aside>    
   );
 }

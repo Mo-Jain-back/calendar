@@ -13,6 +13,7 @@ import EventPopover from "./event-popover";
 import { EventSummaryPopover } from "./event-summary-popover";
 import { useEffect } from "react";
 import dayjs from "dayjs";
+import { useMediaQuery } from "react-responsive";
 
 export default function MainView({
   eventsData,
@@ -31,6 +32,7 @@ export default function MainView({
   } = useEventStore();
 
   const { userSelectedDate } = useDateStore();
+  const isSmallScreen = useMediaQuery({ query: '(max-width: 1024px)' });
 
   useEffect(() => {
     const mappedEvents: CalendarEventType[] = eventsData.map((event) => ({
@@ -48,8 +50,9 @@ export default function MainView({
   }, [eventsData, setEvents]);
 
   return (
-    <div className="flex">
+    <div className="flex ">
       {/* SideBar */}
+    
       <SideBar />
 
       <div className="w-full flex-1">

@@ -13,7 +13,7 @@ export default function MonthViewBox({
   rowIndex: number;
 }) {
   const { openPopover, events } = useEventStore();
-
+  
   const { setDate } = useDateStore();
 
   if (!day) {
