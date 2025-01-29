@@ -55,7 +55,7 @@ export default function WeekView() {
 
         {getWeekDays(userSelectedDate).map(({ currentDate, today }, index) =>{
             return(
-              <HeaderEvent key={index} index={index} date={currentDate} today={today}/>
+              <HeaderEvent key={index} index={index} date={currentDate} today={today} isEventHidden={isEventHidden}/>
         )})}
         
       </div>

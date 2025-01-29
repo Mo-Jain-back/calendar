@@ -4,10 +4,9 @@ import dayjs, { Dayjs } from "dayjs";
 import React, { useEffect, useState } from "react"
 import { useMediaQuery } from "react-responsive";
 
-const HeaderEvent = ({index,date,today}:{index:number,date:Dayjs,today:boolean}) => {
+const HeaderEvent = ({index,date,today,isEventHidden}:{index:number,date:Dayjs,today:boolean,isEventHidden:boolean}) => {
     const { openEventSummary } = useEventStore();
     const { events } = useEventStore();
-    const [isEventHidden, setIsEventHidden] = useState(true);
     const currentDate = date.startOf("day");
     const [sortedEvents, setSortedEvents] = useState<CalendarEventType[]>([]);
     const [isWrapped, setIsWrapped] = useState<boolean>(false);
@@ -67,6 +66,7 @@ const HeaderEvent = ({index,date,today}:{index:number,date:Dayjs,today:boolean})
             filledRows.push(eventRow.rowIndex);
           }
       });
+      console.log("filledRows",filledRows);
 
       setNoOfEvents(filledRows.length);
   
@@ -90,6 +90,9 @@ const HeaderEvent = ({index,date,today}:{index:number,date:Dayjs,today:boolean})
         if(emptyRows[index-1] == temp) break;
         cnt++;
       }
+      console.log("date",date.date());
+      
+      console.log("noOfEvents",noOfEvents);
   
       if(index==0 && isWrapped){
         cnt = 0;
@@ -98,7 +101,7 @@ const HeaderEvent = ({index,date,today}:{index:number,date:Dayjs,today:boolean})
       const singleEventWidth =  "100%";
       
       let width = `calc(${singleEventWidth} * ${Math.min(eventDuration, weekendDuration)} - 1px)`;
-      let marginTop = `${isSmallScreen ? cnt * 13 : cnt * 18}px`;
+      let marginTop = `${isSmallScreen ? cnt * 13 : cnt * 19}px`;
       if(isWrap){
         width=`calc(${singleEventWidth}*${eventDuration} - 1px)`
         marginTop = "0"
@@ -121,7 +124,7 @@ const HeaderEvent = ({index,date,today}:{index:number,date:Dayjs,today:boolean})
             minWidth:"30px"
           }}
           className={cn(
-            "my-[1px] max-sm:h-[12px] w-full flex items-center justify-center cursor-pointer rounded-sm bg-blue-700 text-[7px] sm:text-xs text-white overflow-hidden whitespace-nowrap",
+            "my-[1px] max-sm:h-[12px] h-[18px] w-full flex items-center justify-center cursor-pointer rounded-[3px] sm:rounded-sm bg-[#039BE5] text-[7px] sm:text-xs text-white overflow-hidden whitespace-nowrap",
             isSmallScreen ? "text-[9px]" : "px-2 text-[12px]"
           )}
         >
@@ -144,30 +147,44 @@ const HeaderEvent = ({index,date,today}:{index:number,date:Dayjs,today:boolean})
           {currentDate.format("DD")}{" "}
         </div>
         <div
-          className="flex flex-col w-full transition-all duration-500 ease-in-out"
+          className="flex flex-col w-full min-h-[39px] sm:min-h-[57px] transition-all duration-500 ease-in-out"
           style={{ maxHeight: isEventHidden ? "40px sm:60px" : "" }}
         >
-          {wrappedEvents?.map((e, index) => {
-            const event = events.find((event) => event.id === e.id);
-            if (!event || !e.startDate.isSame(date, "day")) return null;
-            const { width, marginTop } = findOffset(index, e, true);
-            return renderEvent(event, index, width, marginTop);
-          })}
-          {noOfEvents < 4 || !isEventHidden ? (
-            sortedEvents.map((event, index) => {
+          
+          {noOfEvents+sortedEvents.length < 4 || !isEventHidden ? (
+            <>
+            {wrappedEvents?.map((e, index) => {
+              const event = events.find((event) => event.id === e.id);
+              if (!event || !e.startDate.isSame(date, "day")) return null;
+              const { width, marginTop } = findOffset(index, e, true);
+              return renderEvent(event, index, width, marginTop);
+            })}
+            {sortedEvents.map((event, index) => {
               const { width, marginTop } = findOffset(index, event);
               return renderEvent(event, index, width, marginTop);
-            })
+            })}
+            </>
           ) : (
             <>
-              {sortedEvents.slice(0, 2).map((event, index) => {
+              {wrappedEvents?.slice(0, 2).map((e, index) => {
+                console.log("date",date.date());
+                console.log("wrappedEventsLength",wrappedEvents.length)
+              const event = events.find((event) => event.id === e.id);
+              if (!event || !e.startDate.isSame(date, "day")) return null;
+                const { width, marginTop } = findOffset(index, e, true);
+                return renderEvent(event, index, width, marginTop);
+              })}
+              {sortedEvents.slice(0, 2-noOfEvents | 0).map((event, index) => {
+                console.log("date",date.date());
+                console.log("sortedEvents",sortedEvents.length)
                 const { width, marginTop } = findOffset(index, event);
                 return renderEvent(event, index, width, marginTop);
               })}
-              <div className="text-xs sm:text-sm px-2">+{noOfEvents - 2}</div>
             </>
           )}
         </div>
+        {noOfEvents+sortedEvents.length >= 4 && isEventHidden &&
+          <div  className="text-xs sm:text-sm px-2">+{noOfEvents+sortedEvents.length-2}</div>}
       </div>
     );
   };
