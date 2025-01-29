@@ -27,7 +27,7 @@ export default function HeaderRight(
     <div className="flex items-center space-x-4">
     {/* <SearchComponent /> */}
     <Select onValueChange={(v) => handleStreamView(v) }>
-      <SelectTrigger className="sm:w-24 w-18 p-1 sm:p-2 text-xs sm:text-sm focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ring focus-visible:ring-offset-0">
+      <SelectTrigger className="sm:w-24 select-none w-18 p-1 sm:p-2 text-xs sm:text-sm active:outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ring focus-visible:ring-offset-0">
         <SelectValue placeholder="Month" />
       </SelectTrigger>
       <SelectContent>

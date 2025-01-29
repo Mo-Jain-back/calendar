@@ -36,7 +36,8 @@ export default function DayView() {
 
   const getFormatedEvents = (events:CalendarEventType[], date:Dayjs) => {
     const selectedEvents = events.filter((event: CalendarEventType) => {
-        return event.startDate.format("DD-MM-YY") === date.format("DD-MM-YY");
+        return event.startDate.isSame(date,"days")
+            && event.endDate.isSame(date,"days")
       });
 
     setFilteredEvents(selectedEvents);

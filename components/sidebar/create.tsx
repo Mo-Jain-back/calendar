@@ -30,7 +30,7 @@ export default function Create() {
         className="w-[150px] justify-start rounded-full py-6 shadow"
         onClick={handleOpenPopover}
       >
-        <SvgIcons.googleCreate className="mr-2 h-8 w-8" /> <span> Create </span>{" "}
+        <SvgIcons.googleCreate className="mr-2 h-8 w-8" /> <span className="select-none"> Create </span>{" "}
         <ChevronDown />
       </Button>
       {isPopoverOpen && (

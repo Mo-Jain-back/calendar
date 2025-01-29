@@ -109,11 +109,11 @@ export default function HeaderLeft(
           height={40}
           alt="icon"
         />
-        <h1 className="text-xl">Calendar</h1>
+        <h1 className="text-xl select-none">Calendar</h1>
       </div>
 
       {/* Today Button */}
-      <Button variant="outline" className="text-xs sm:text-sm px-2 py-1" onClick={handleTodayClick}>
+      <Button variant="outline" className="text-xs select-none sm:text-sm px-2 py-1" onClick={handleTodayClick}>
         Today
       </Button>
 

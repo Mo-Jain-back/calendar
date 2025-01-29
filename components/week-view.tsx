@@ -29,8 +29,9 @@ export default function WeekView() {
 
   const getFormatedEvents = (events:CalendarEventType[], date:Dayjs) => {
     const filteredEvents = events.filter((event: CalendarEventType) => {
-        return event.startDate.format("DD-MM-YY HH") === date.format("DD-MM-YY HH");
-      });
+      return event.startDate.isSame(date,"days")
+      && event.endDate.isSame(date,"days")
+    })
 
     return filteredEvents;
   }
