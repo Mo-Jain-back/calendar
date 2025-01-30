@@ -9,6 +9,8 @@ import { useEventStore, type CalendarEventType } from "@/lib/store"
 import { Input } from "@/components/ui/input"
 import dayjs from "dayjs"
 import { Clock, CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { DatePicker } from "@/components/ui/datepicker";
+import AddTime from "./add-time"
 
 enum Status {
   pending = "pending",
@@ -71,6 +73,13 @@ export function EventSummaryPopup({ event, isOpen, onClose }: EventSummaryPopupP
     setIsEditing(false)
   }
 
+  const handleDateChange = (date:Date,type?:string) => {
+    if(type === "start") {
+      setStartDate(dayjs(date))
+    } else if(type === "end") {
+      setEndDate(dayjs(date))
+    }
+  }
 
   return (
     <Dialog open={isOpen}  onOpenChange={onClose}>
@@ -92,38 +101,25 @@ export function EventSummaryPopup({ event, isOpen, onClose }: EventSummaryPopupP
           <div className="flex-1">
             <h2 className="text-lg font-semibold mb-2">Your booking starts from</h2>
             {isEditing ? (
-              <div className="space-y-2">
-                <Input
-                  type="date"
-                  name="startDate"
-                  value={startDate.format("YYYY-MM-DD")}
-                  onChange={(e) => setStartDate(dayjs(e.target.value))}
-                  className="bg-gray-100"
-                />
+              <div className="space-y-2 flex items-center justify-around max-h-[38px]">
+                <div className="mt-[7px]">
+                  <DatePicker currDate={startDate} handleDateChange={handleDateChange} dateType="start"/>
+                </div>
                 {!event.allDay && (
-                  <Input
-                    type="time"
-                    name="startTime"
-                    value={startTime}
-                    onChange={(e) => setStartTime(e.target.value)}
-                    className="bg-gray-100"
-                  />
+                  <div className="mt-[-10px] mx-2">
+                    <AddTime className="p-0 m-0 w-[50px] border-none bg-gray-200 hover:bg-gray-300 rounded-sm" currTime={startTime} onTimeSelect={setStartTime} />
+                    <input type="hidden" name="time" value={startTime} />
+                  </div>
                 )}
-                <Input
-                  type="date"
-                  name="endDate"
-                  value={endDate.format("YYYY-MM-DD")}
-                  onChange={(e) => setEndDate(dayjs(e.target.value))}
-                  className="bg-gray-100"
-                />
+                <div className="text-center mt-[-8px]"> -</div>
+                <div className="flex items-center justify-center mt-[-9px]">
+                  <DatePicker  currDate={endDate} handleDateChange={handleDateChange} dateType="end"/>
+                </div>
                 {!event.allDay && (
-                  <Input
-                    type="time"
-                    name="endTime"
-                    value={endTime}
-                    onChange={(e) => setEndTime(e.target.value)}
-                    className="bg-gray-100"
-                  />
+                  <div className="mt-[-10px] mx-2">
+                    <AddTime className="p-0 m-0 w-[50px] border-none bg-gray-200 hover:bg-gray-300 rounded-sm" currTime={endTime} onTimeSelect={setStartTime} />
+                    <input type="hidden" name="time" value={endTime} />
+                  </div>
                 )}
               </div>
             ) : (

@@ -8,10 +8,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useViewStore } from "@/lib/store";
 import { Car } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import CarsFilters from "../sidebar/cars-filter";
 
 export default function HeaderRight(
   {setOpen}:
@@ -49,31 +54,14 @@ export default function HeaderRight(
       </SelectContent>
     </Select>
     <div className="lg:hidden">
-      <Select onValueChange={(v) => handleCarsCheck() }>
-        <SelectTrigger className="w-[50px] p-0 px-1 focus-visible:ring-0" >
+      <Popover>
+        <PopoverTrigger className="w-[50px] p-2 rounded-sm border" >
         <Car className="h-5 w-5 " />
-        </SelectTrigger>
-        <SelectContent>
-          {myCars.map((cal) => (
-              <div className="items-top flex space-x-2 py-2" key={cal.id}>
-                <input
-                  type="checkbox"
-                  id={cal.id}
-                  
-                  className={cn("h-4 w-4 rounded-none selected-true", `${cal.color}`)}
-                />
-                <div className="grid gap-1.5 leading-none">
-                  <label
-                    htmlFor={cal.id}
-                    className="text-sm font-medium leading-none text-gray-600 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    {cal.title}
-                  </label>
-                </div>
-              </div>
-            ))}
-        </SelectContent>
-      </Select>
+        </PopoverTrigger>
+        <PopoverContent >
+          <CarsFilters/>
+        </PopoverContent>
+      </Popover>
     </div>
     
   </div>

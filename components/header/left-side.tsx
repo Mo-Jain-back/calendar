@@ -149,7 +149,7 @@ export default function HeaderLeft(
           <BsCaretDownFill  className={`text-xl sm:hidden min-size-3 ml-1 h-3 w-3 py-0 rounded-sm transition-transform duration-300 ${
               open ? 'rotate-180' : 'rotate-0'
             }`} 
-          onClick={() => setOpen((open)=> !open)}
+        
           style= {{rotate : `${open ? "180" : ""}`}}
           />
         </div>
