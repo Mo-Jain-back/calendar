@@ -9,13 +9,13 @@ import {
 
 import { cn } from "@/lib/utils";
 
-const myCalendars = [
-  { id: "cal1", title: "Work", color: "accent-red-600" },
-  { id: "cal2", title: "Personal", color: "accent-blue-600" },
-  { id: "cal3", title: "Fitness", color: "accent-green-600" },
+const myCars = [
+  { id: "cal1", title: "Tesla Mode 3", color: "accent-red-600" },
+  { id: "cal2", title: "Maruti", color: "accent-blue-600" },
+  { id: "cal3", title: "Audi", color: "accent-green-600" },
 ];
 
-export default function MyCalendars() {
+export default function MyCars() {
   return (
     <Accordion type="single" collapsible>
       <AccordionItem value="item-1">
@@ -23,12 +23,13 @@ export default function MyCalendars() {
           My Cars
         </AccordionTrigger>
         <AccordionContent className="grid gap-2">
-          {myCalendars.map((cal) => (
+          {myCars.map((cal) => (
             <div className="items-top flex space-x-2" key={cal.id}>
               <input
                 type="checkbox"
                 id={cal.id}
-                className={cn("h-4 w-4 rounded-none", `${cal.color}`)}
+                
+                className={cn("h-4 w-4 rounded-none selected-true", `${cal.color}`)}
               />
               <div className="grid gap-1.5 leading-none">
                 <label

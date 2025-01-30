@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import React from "react";
 import SideBarCalendar from "./side-bar-calendar";
 import SearchUsers from "./search-users";
-import MyCalendars from "./my-calendars";
+import MyCars from "./my-cars";
 import { useToggleSideBarStore } from "@/lib/store";
 
 export default function SideBar() {
@@ -20,7 +20,7 @@ export default function SideBar() {
       >
       <SideBarCalendar />
       <SearchUsers />
-      <MyCalendars />
+      <MyCars />
     </aside>    
   );
 }

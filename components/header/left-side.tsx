@@ -11,8 +11,14 @@ import dayjs from "dayjs";
 import TestComponent from "./test";
 
 export default function HeaderLeft(
-  {setOpen}:
-  {setOpen: React.Dispatch<React.SetStateAction<boolean>>}
+  {
+    setOpen,
+    open
+  }:
+  {
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>,
+    open:boolean
+  }
 ) {
   const todaysDate = dayjs();
   const [color, setColor] = useState('#ffffff');
@@ -135,14 +141,20 @@ export default function HeaderLeft(
 
       {/* Current Month and Year Display */}
       <h1 className={`text-sm ml-2 sm:ml-0 h-fit w-fit sm:text-xl block flex justify-around items-center`} style={{ backgroundColor: color }}>
-        <div className="sm:pb-1">
-        {dayjs(new Date(dayjs().year(), selectedMonthIndex)).format(
-          "MMMM YYYY",
-        )}</div>
+        <div className="sm:pb-1 flex items-center max-sm:cursor-pointer  mr-[4px]"
+          onClick={() => setOpen((open)=> !open)}>
+          {dayjs(new Date(dayjs().year(), selectedMonthIndex)).format(
+            "MMMM YYYY",
+          )}
+          <BsCaretDownFill  className={`text-xl sm:hidden min-size-3 ml-1 h-3 w-3 py-0 rounded-sm transition-transform duration-300 ${
+              open ? 'rotate-180' : 'rotate-0'
+            }`} 
+          onClick={() => setOpen((open)=> !open)}
+          style= {{rotate : `${open ? "180" : ""}`}}
+          />
+        </div>
       </h1>
-        <BsCaretDownFill  className="text-xl sm:hidden min-size-3 ml-1 border border-gray-200 rounded-md p-1 h-fit" 
-        onClick={() => setOpen((open)=> !open)}
-        />
+        
     </div>
   );
 }
