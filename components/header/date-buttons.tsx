@@ -13,10 +13,20 @@ const DateButtons = ({open}:{open:boolean}) => {
     const [selectedMonth,setSelectedMonth] = useState(todaysDate.format("MMM"));
     const { selectedView } = useViewStore();
     const isSmallScreen = useMediaQuery({ query: '(max-width: 640px)' }); 
+    const [hydrated, setHydrated] = useState(false);
+
+    useEffect(() => {
+      setHydrated(true);
+    }, []);
 
     useEffect(() => {
         setSelectedMonth(months[selectedMonthIndex]);
     }, [selectedMonthIndex]);
+
+    if (!hydrated) {
+      return null; // Render nothing on the first render to match server and client HTML
+    }
+
     
     const handleClick = (month:string,index:number) => {
         setSelectedMonth(month);
@@ -31,7 +41,7 @@ const DateButtons = ({open}:{open:boolean}) => {
     return (
         <>
           {
-            isSmallScreen && 
+            isSmallScreen && open &&
             <div className={`${open ? "mt-0 " : "sm:mt-[-58px] mt-[-60px] opacity-0 " }  duration-300 ease-in-out`}>
               <div className={`${(selectedView != "month" && !open) ? "mt-[-370px] opacity-0" : "mt-[-30px] mb-[0]" } my-0 duration-300 ease-in-out`} >
                   {selectedView != "month" &&
@@ -40,7 +50,7 @@ const DateButtons = ({open}:{open:boolean}) => {
               <div className="relative flex mt-[-25px] w-full justify-around p-2 overflow-scroll scrollbar-hide">
                   { 
                   months.map((month,index) => (
-                      <div className={`p-1 text-sm ${selectedMonth===month ?"bg-gray-200":"bg-white"} cursor-pointer px-2 border border-gray-400 rounded-md`}
+                      <div key={index} className={`p-1 text-sm ${selectedMonth===month ?"bg-gray-200":"bg-white"} cursor-pointer px-2 border border-gray-400 rounded-md`}
                       onClick = {() => handleClick(month,index)}
                       >
                       {month}
